@@ -1,0 +1,1065 @@
+**********************
+Windows PowerShell transcript start
+Start time: 20161021083457
+Username: NORTHAMERICA\prestopa
+RunAs User: NORTHAMERICA\prestopa
+Machine: PRESTOPA-HP840 (Microsoft Windows NT 10.0.14393.0)
+Host Application: C:\WINDOWS\system32\WindowsPowerShell\v1.0\PowerShell_ISE.exe
+Process ID: 14636
+PSVersion: 5.1.14393.206
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.14393.206
+BuildVersion: 10.0.14393.206
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcript started, output file is \Users\prestopa\PowerShellAzurePoC\PowerShell-PoC-Transcript-2016-10-21-0834.log
+VERBOSE: The specified assembly 'C:\Program Files\PackageManagement\ProviderAssemblies\nuget-anycpu.exe' in \ProviderAssemblies, should be installed in ProviderAssemblies\ProviderName\Version. Either delete the provider assembly from \ProviderAssemblies, or create \ProviderAssemblies\ProvidernName\Version, and then move the assembly there.
+
+FastPackageReference : https://oneget.org/nuget-2.8.5.207.package.swidtag
+ProviderName         : Bootstrap
+Source               : https://oneget.org/nuget-2.8.5.207.package.swidtag
+Status               : Installed
+SearchKey            : https://oneget.org/nuget-2.8.5.207.package.swidtag
+FullPath             :
+PackageFilename      : Microsoft.PackageManagement.NuGetProvider.dll
+FromTrustedSource    : False
+Summary              : NuGet provider for the OneGet meta-package manager
+SwidTags             : {nuget}
+CanonicalId          : bootstrap:nuget/2.8.5.207#https://oneget.org/nuget-2.8.5.207.package.swidtag
+Metadata             : {summary,providerName,providerVersion,summary}
+SwidTagText          : <?xml version="1.0" encoding="utf-16" standalone="yes"?>
+                       <SoftwareIdentity
+                         name="nuget"
+                         version="2.8.5.207"
+                         versionScheme="multipartnumeric" xmlns="http://standards.iso.org/iso/19770/-2/2015/schema.xsd">
+                         <Meta
+                           summary="NuGet provider for the OneGet meta-package manager" />
+                         <Meta
+                           providerName="nuget"
+                           providerVersion="2.8.5.207"
+                           summary="NuGet provider for the OneGet meta-package manager" />
+                         <Link
+                           href="https://oneget.org/Microsoft.PackageManagement.NuGetProvider-2.8.5.207.dll"
+                           rel="installationmedia"
+                           type="application/octet-stream"
+                           media="(OS:windows)" />
+                       </SoftwareIdentity>
+Dependencies         : {}
+IsCorpus             :
+Name                 : nuget
+Version              : 2.8.5.207
+VersionScheme        : multipartnumeric
+TagVersion           :
+TagId                :
+IsPatch              :
+IsSupplemental       :
+AppliesToMedia       :
+Meta                 : {{summary}, {providerName,providerVersion,summary}}
+Links                : {installationmedia:https://oneget.org/Microsoft.PackageManagement.NuGetProvider-2.8.5.207.dll}
+Entities             : {}
+Payload              :
+Evidence             :
+Culture              :
+Attributes           : {name,version,versionScheme}
+
+VERBOSE: Repository details, Name = 'PSGallery', Location = 'https://www.powershellgallery.com/api/v2/'; IsTrusted = 'True'; IsRegistered = 'True'.
+VERBOSE: Using the provider 'PowerShellGet' for searching packages.
+VERBOSE: Using the specified source names : 'PSGallery'.
+VERBOSE: Getting the provider object for the PackageManagement Provider 'NuGet'.
+VERBOSE: The specified Location is 'https://www.powershellgallery.com/api/v2/' and PackageManagementProvider is 'NuGet'.
+VERBOSE: There were not enough free threads in the ThreadPool to complete the operation.
+VERBOSE: Retry downloading 'https://www.powershellgallery.com/api/v2/' for '2' more times
+VERBOSE: There were not enough free threads in the ThreadPool to complete the operation.
+VERBOSE: Retry downloading 'https://www.powershellgallery.com/api/v2/' for '1' more times
+VERBOSE: There were not enough free threads in the ThreadPool to complete the operation.
+VERBOSE: Retry downloading 'https://www.powershellgallery.com/api/v2/FindPackagesById()?id='FoooBarr'' for '2' more times
+VERBOSE: There were not enough free threads in the ThreadPool to complete the operation.
+VERBOSE: Retry downloading 'https://www.powershellgallery.com/api/v2/FindPackagesById()?id='FoooBarr'' for '1' more times
+VERBOSE: Searching repository 'https://www.powershellgallery.com/api/v2/FindPackagesById()?id='WriteToLogs'' for ''.
+VERBOSE: Total package yield:'1' for the specified package 'WriteToLogs'.
+VERBOSE: Performing the operation "Install-Module" on target "Version '1.0.21' of module 'WriteToLogs'".
+VERBOSE: The installation scope is specified to be 'AllUsers'.
+VERBOSE: The specified module will be installed in 'C:\Program Files\WindowsPowerShell\Modules'.
+VERBOSE: The specified Location is 'NuGet' and PackageManagementProvider is 'NuGet'.
+VERBOSE: Downloading module 'WriteToLogs' with version '1.0.21' from the repository 'https://www.powershellgallery.com/api/v2/'.
+VERBOSE: Searching repository 'https://www.powershellgallery.com/api/v2/FindPackagesById()?id='WriteToLogs'' for ''.
+VERBOSE: InstallPackage' - name='WriteToLogs', version='1.0.21',destination='C:\Users\prestopa\AppData\Local\Temp\201274052'
+VERBOSE: DownloadPackage' - name='WriteToLogs', version='1.0.21',destination='C:\Users\prestopa\AppData\Local\Temp\201274052\WriteToLogs\WriteToLogs.nupkg', uri='https://www.powershellgallery.com/api/v2/package/WriteToLogs/1.0.21'
+VERBOSE: Downloading 'https://www.powershellgallery.com/api/v2/package/WriteToLogs/1.0.21'.
+VERBOSE: Completed downloading 'https://www.powershellgallery.com/api/v2/package/WriteToLogs/1.0.21'.
+VERBOSE: Completed downloading 'WriteToLogs'.
+VERBOSE: InstallPackageLocal' - name='WriteToLogs', version='1.0.21',destination='C:\Users\prestopa\AppData\Local\Temp\201274052'
+VERBOSE: Catalog file 'WriteToLogs.cat' is not found in the contents of the module 'WriteToLogs' being installed.
+VERBOSE: For publisher validation, using the previously-installed module 'WriteToLogs' with version '1.0.21' under 'C:\Program Files\WindowsPowerShell\Modules\WriteToLogs' with publisher name ''. Is this module signed by Microsoft: 'False'.
+VERBOSE: Module 'WriteToLogs' was installed successfully to path 'C:\Program Files\WindowsPowerShell\Modules\WriteToLogs\1.0.21'.
+VERBOSE: Loading module from path 'C:\Program Files\WindowsPowerShell\Modules\WriteToLogs\1.0.21\WriteToLogs.psd1'.
+VERBOSE: Populating RepositorySourceLocation property for module WriteToLogs.
+VERBOSE: Loading module from path 'C:\Program Files\WindowsPowerShell\Modules\WriteToLogs\1.0.21\WriteToLogs.psm1'.
+VERBOSE: Importing function 'Write-ToConsoleAndLog'.
+VERBOSE: Importing function 'Write-ToLogOnly'.
+VERBOSE: Importing function 'Write-WithTime'.
+MSFT
+
+Account      : prestopa@microsoft.com
+Environment  : AzureCloud
+Subscription : 51bf817c-66af-4ca8-bcac-13d3df80171a
+Tenant       : 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+====================================================================================================
+AZURE RM POWERSHELL POC DEPLOYMENT DEMO: 2016-10-21-0834
+====================================================================================================
+VERBOSE: Creating resource groups
+T08:35:55.1824828: Creating resource groups
+Confirm
+Provided resource group already exists. Are you sure you want to update it?
+&Yes  &No  &Suspend
+S
+**********************
+Command start time: 20161021083703
+**********************
+PS>exit
+Confirm
+Provided resource group already exists. Are you sure you want to update it?
+&Yes  &No  &Suspend
+N
+VERBOSE: Creating Subnets...
+T08:37:08.6363167: Creating Subnets...
+VERBOSE: Creating west virtual network
+T08:37:10.2613170: Creating west virtual network
+**********************
+Command start time: 20161021083710
+**********************
+PS>TerminatingError(New-AzureRmVirtualNetwork): "Cannot validate argument on parameter 'ResourceGroupName'. The argument is null or empty. Provide an argument that is not null or empty, and then try the command again."
+>> TerminatingError(New-AzureRmVirtualNetwork): "Cannot validate argument on parameter 'ResourceGroupName'. The argument is null or empty. Provide an argument that is not null or empty, and then try the command again."
+New-AzureRmVirtualNetwork : Cannot validate argument on parameter 'ResourceGroupName'. The argument is null or empty. Provide an argument that is not null or empty, and then try the command again.
+At C:\Users\prestopa\OneDrive\02.00.00.GENERAL\02.15.00.IT\02.15.02.SW\SOLUTIONS\00-GIT-PRV\AZURE\DEPLOY-DECOM\PSDeploymentPoc-TST\AzurePowerShellSampleDeployment\Powershell-PoC-Environment-Setup.ps1:455 char:76
++ ... Name "West-VNET" -ResourceGroupName $rgWest.ResourceGroupName -Locati ...
++                                         ~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidData: (:) [New-AzureRmVirtualNetwork], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ParameterArgumentValidationError,Microsoft.Azure.Commands.Network.NewAzureVirtualNetworkCommand
+
+VERBOSE: Performing the operation "Create File" on target "Destination: C:\Users\prestopa\PowerShellAzurePoC\PowerShell-PoC-EnvSetup-2016-10-21-0846.log".
+
+LastWriteTime : 10/21/2016 08:46:03
+Length        : 0
+Name          : PowerShell-PoC-EnvSetup-2016-10-21-0846.log
+
+VERBOSE: Performing the operation "Create File" on target "Destination: C:\Users\prestopa\PowerShellAzurePoC\PowerShell-PoC-Transcript-2016-10-21-0846.log".
+
+LastWriteTime : 10/21/2016 08:46:03
+Length        : 0
+Name          : PowerShell-PoC-Transcript-2016-10-21-0846.log
+
+VERBOSE: Performing the operation "Start-Transcript" on target "C:\Users\prestopa\PowerShellAzurePoC\PowerShell-PoC-Transcript-2016-10-21-0846.log".
+Transcript started, output file is \Users\prestopa\PowerShellAzurePoC\PowerShell-PoC-Transcript-2016-10-21-0846.log
+VERBOSE: Performing the operation "Uninstall-Module" on target "Version '1.0.21' of module 'WriteToLogs'".
+VERBOSE: Successfully uninstalled the module 'WriteToLogs' from module base 'C:\Program Files\WindowsPowerShell\Modules\WriteToLogs\1.0.21'.
+MSFT
+
+Account      : prestopa@microsoft.com
+Environment  : AzureCloud
+Subscription : 51bf817c-66af-4ca8-bcac-13d3df80171a
+Tenant       : 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+====================================================================================================
+AZURE RM POWERSHELL POC DEPLOYMENT DEMO: 2016-10-21-0846
+====================================================================================================
+VERBOSE: Creating resource groups
+T08:47:05.9600385: Creating resource groups
+VERBOSE: Creating Subnets...
+T08:47:08.5842964: Creating Subnets...
+VERBOSE: Creating west virtual network
+T08:47:08.6267927: Creating west virtual network
+WARNING: The output object type of this cmdlet will be modified in a future release.
+VERBOSE: Creating east virtual network
+T08:47:41.7397519: Creating east virtual network
+WARNING: The output object type of this cmdlet will be modified in a future release.
+VERBOSE: Establishing VNET to VNET Connection, working on west side
+T08:48:12.5329424: Establishing VNET to VNET Connection, working on west side
+WARNING: The output object type of this cmdlet will be modified in a future release.
+VERBOSE: Creating West Gateway
+WARNING: The output object type of this cmdlet will be modified in a future release.
+
+IpConfigurations           : {westus-gwipconfig}
+GatewayType                : Vpn
+VpnType                    : RouteBased
+EnableBgp                  : False
+ActiveActive               : False
+GatewayDefaultSite         :
+ProvisioningState          : Succeeded
+Sku                        : Microsoft.Azure.Commands.Network.Models.PSVirtualNetworkGatewaySku
+VpnClientConfiguration     :
+BgpSettings                : Microsoft.Azure.Commands.Network.Models.PSBgpSettings
+IpConfigurationsText       : [
+                               {
+                                 "PrivateIpAllocationMethod": "Dynamic",
+                                 "Subnet": {
+                                   "Id": "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-west-rg/providers/Microsoft.Network/virtualNetworks/West-VNET/subnets/GatewaySubnet"
+                                 },
+                                 "PublicIpAddress": {
+                                   "Id": "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-west-rg/providers/Microsoft.Network/publicIPAddresses/westus-gwpip"
+                                 },
+                                 "Name": "westus-gwipconfig",
+                                 "Etag": "W/\"0e73608a-890f-4157-ba08-8ea017d5b8ef\"",
+                                 "Id": "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-west-rg/providers/Microsoft.Network/virtualNetworkGateways/westus-vnet-Gateway/ipConfigurations/westus-gwipconfig"
+                               }
+                             ]
+GatewayDefaultSiteText     : null
+SkuText                    : {
+                               "Capacity": 2,
+                               "Name": "Basic",
+                               "Tier": "Basic"
+                             }
+VpnClientConfigurationText : null
+BgpSettingsText            : {
+                               "Asn": 65515,
+                               "BgpPeeringAddress": "10.0.255.254",
+                               "PeerWeight": 0
+                             }
+ResourceGroupName          : poc-west-rg
+Location                   : westus
+ResourceGuid               : 69489aca-c5ed-4872-a4aa-967bbf87ae43
+Tag                        :
+TagsTable                  :
+Name                       : westus-vnet-Gateway
+Etag                       : W/"0e73608a-890f-4157-ba08-8ea017d5b8ef"
+Id                         : /subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-west-rg/providers/Microsoft.Network/virtualNetworkGateways/westus-vnet-Gateway
+
+WARNING: The output object type of this cmdlet will be modified in a future release.
+VERBOSE: Creating East Gateway
+WARNING: The output object type of this cmdlet will be modified in a future release.
+
+IpConfigurations           : {eastus-gwipconfig}
+GatewayType                : Vpn
+VpnType                    : RouteBased
+EnableBgp                  : False
+ActiveActive               : False
+GatewayDefaultSite         :
+ProvisioningState          : Succeeded
+Sku                        : Microsoft.Azure.Commands.Network.Models.PSVirtualNetworkGatewaySku
+VpnClientConfiguration     :
+BgpSettings                : Microsoft.Azure.Commands.Network.Models.PSBgpSettings
+IpConfigurationsText       : [
+                               {
+                                 "PrivateIpAllocationMethod": "Dynamic",
+                                 "Subnet": {
+                                   "Id": "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/virtualNetworks/East-VNET/subnets/GatewaySubnet"
+                                 },
+                                 "PublicIpAddress": {
+                                   "Id": "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/publicIPAddresses/eastus-gwpip"
+                                 },
+                                 "Name": "eastus-gwipconfig",
+                                 "Etag": "W/\"5aab2d3a-6401-4f8f-bac3-a82c7cda6635\"",
+                                 "Id": "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/virtualNetworkGateways/eastus-vnet-Gateway/ipConfigurations/eastus-gwipconfig"
+                               }
+                             ]
+GatewayDefaultSiteText     : null
+SkuText                    : {
+                               "Capacity": 2,
+                               "Name": "Basic",
+                               "Tier": "Basic"
+                             }
+VpnClientConfigurationText : null
+BgpSettingsText            : {
+                               "Asn": 65515,
+                               "BgpPeeringAddress": "192.168.255.254",
+                               "PeerWeight": 0
+                             }
+ResourceGroupName          : poc-east-rg
+Location                   : eastus
+ResourceGuid               : 8fdf8283-6a98-49b8-807a-249f57bee5f5
+Tag                        :
+TagsTable                  :
+Name                       : eastus-vnet-Gateway
+Etag                       : W/"5aab2d3a-6401-4f8f-bac3-a82c7cda6635"
+Id                         : /subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/virtualNetworkGateways/eastus-vnet-Gateway
+
+VERBOSE: Connecting Gateways
+T09:48:50.3368074: Connecting Gateways
+WARNING: The output object type of this cmdlet will be modified in a future release.
+
+GatewayIpAddress         : 137.135.74.3
+LocalNetworkAddressSpace : Microsoft.Azure.Commands.Network.Models.PSAddressSpace
+ProvisioningState        : Succeeded
+BgpSettings              :
+AddressSpaceText         : {
+                             "AddressPrefixes": [
+                               "192.168.0.0/16"
+                             ]
+                           }
+BgpSettingsText          : null
+ResourceGroupName        : poc-west-rg
+Location                 : westus
+ResourceGuid             : 801d563b-25f4-4b8c-b7f6-de3cf40dc50c
+Tag                      :
+TagsTable                :
+Name                     : eastus-LocalNetworkGateway
+Etag                     : W/"d7b09151-0ecc-4126-a67d-da8a2310e825"
+Id                       : /subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-west-rg/providers/Microsoft.Network/localNetworkGateways/eastus-LocalNetworkGateway
+
+WARNING: The output object type of this cmdlet will be modified in a future release.
+
+GatewayIpAddress         : 104.42.225.155
+LocalNetworkAddressSpace : Microsoft.Azure.Commands.Network.Models.PSAddressSpace
+ProvisioningState        : Succeeded
+BgpSettings              :
+AddressSpaceText         : {
+                             "AddressPrefixes": [
+                               "10.0.0.0/16"
+                             ]
+                           }
+BgpSettingsText          : null
+ResourceGroupName        : poc-east-rg
+Location                 : eastus
+ResourceGuid             : dbc69c37-15a8-4723-8d52-9f1bfbe49035
+Tag                      :
+TagsTable                :
+Name                     : westus-LocalNetworkGateway
+Etag                     : W/"9fb6cfde-05f8-4e52-bc8a-2eee20dc12b9"
+Id                       : /subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/localNetworkGateways/westus-LocalNetworkGateway
+
+WARNING: The output object type of this cmdlet will be modified in a future release.
+
+AuthorizationKey           :
+VirtualNetworkGateway1     : Microsoft.Azure.Commands.Network.Models.PSVirtualNetworkGateway
+VirtualNetworkGateway2     :
+LocalNetworkGateway2       : Microsoft.Azure.Commands.Network.Models.PSLocalNetworkGateway
+Peer                       :
+ConnectionType             : IPsec
+RoutingWeight              : 10
+SharedKey                  : ae9621e2
+EnableBgp                  : False
+ConnectionStatus           : Unknown
+EgressBytesTransferred     : 0
+IngressBytesTransferred    : 0
+ProvisioningState          : Succeeded
+VirtualNetworkGateway1Text : "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-west-rg/providers/Microsoft.Network/virtualNetworkGateways/westus-vnet-Gateway"
+VirtualNetworkGateway2Text :
+LocalNetworkGateway2Text   : "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-west-rg/providers/Microsoft.Network/localNetworkGateways/eastus-LocalNetworkGateway"
+PeerText                   :
+ResourceGroupName          : poc-west-rg
+Location                   : westus
+ResourceGuid               : c91a9541-8e83-4b0b-9fc3-506615b172f1
+Tag                        :
+TagsTable                  :
+Name                       : westus-gwConnection
+Etag                       : W/"4761b1d6-973c-41c9-bebb-2b25ad42e870"
+Id                         : /subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-west-rg/providers/Microsoft.Network/connections/westus-gwConnection
+
+WARNING: The output object type of this cmdlet will be modified in a future release.
+
+AuthorizationKey           :
+VirtualNetworkGateway1     : Microsoft.Azure.Commands.Network.Models.PSVirtualNetworkGateway
+VirtualNetworkGateway2     :
+LocalNetworkGateway2       : Microsoft.Azure.Commands.Network.Models.PSLocalNetworkGateway
+Peer                       :
+ConnectionType             : IPsec
+RoutingWeight              : 10
+SharedKey                  : ae9621e2
+EnableBgp                  : False
+ConnectionStatus           : Unknown
+EgressBytesTransferred     : 0
+IngressBytesTransferred    : 0
+ProvisioningState          : Succeeded
+VirtualNetworkGateway1Text : "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/virtualNetworkGateways/eastus-vnet-Gateway"
+VirtualNetworkGateway2Text :
+LocalNetworkGateway2Text   : "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/localNetworkGateways/westus-LocalNetworkGateway"
+PeerText                   :
+ResourceGroupName          : poc-east-rg
+Location                   : eastus
+ResourceGuid               : c6f5b276-01dc-42ed-b71d-2bf87ee3d743
+Tag                        :
+TagsTable                  :
+Name                       : eastus-gwConnection
+Etag                       : W/"540b8b7e-a520-4d47-8f3c-784d988cdac7"
+Id                         : /subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/connections/eastus-gwConnection
+
+VERBOSE: Creating the IIS Loadbalancer
+T09:51:01.0052746: Creating the IIS Loadbalancer
+WARNING: The output object type of this cmdlet will be modified in a future release.
+WARNING: The output object type of this cmdlet will be modified in a future release.
+WARNING: The output object type of this cmdlet will be modified in a future release.
+VERBOSE: Network Security Group
+T09:52:05.7900039: Network Security Group
+WARNING: The output object type of this cmdlet will be modified in a future release.
+WARNING: The output object type of this cmdlet will be modified in a future release.
+
+AddressSpace               : Microsoft.Azure.Commands.Network.Models.PSAddressSpace
+DhcpOptions                : Microsoft.Azure.Commands.Network.Models.PSDhcpOptions
+Subnets                    : {East-VNET-App-Subnet, GatewaySubnet}
+VirtualNetworkPeerings     : {}
+ProvisioningState          : Succeeded
+AddressSpaceText           : {
+                               "AddressPrefixes": [
+                                 "192.168.0.0/16"
+                               ]
+                             }
+DhcpOptionsText            : {
+                               "DnsServers": []
+                             }
+SubnetsText                : [
+                               {
+                                 "Name": "East-VNET-App-Subnet",
+                                 "Etag": "W/\"438031ca-8a33-4e75-a33f-bea27859592d\"",
+                                 "Id": "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/virtualNetworks/East-VNET/subnets/East-VNET-App-Subnet",
+                                 "AddressPrefix": "192.168.0.0/24",
+                                 "IpConfigurations": [],
+                                 "ResourceNavigationLinks": [],
+                                 "NetworkSecurityGroup": {
+                                   "Id": "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/networkSecurityGroups/East-SN-NSG"
+                                 },
+                                 "ProvisioningState": "Succeeded"
+                               },
+                               {
+                                 "Name": "GatewaySubnet",
+                                 "Etag": "W/\"438031ca-8a33-4e75-a33f-bea27859592d\"",
+                                 "Id": "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/virtualNetworks/East-VNET/subnets/GatewaySubnet",
+                                 "AddressPrefix": "192.168.255.0/24",
+                                 "IpConfigurations": [
+                                   {
+                                     "Id":
+                             "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/virtualNetworkGateways/eastus-vnet-Gateway/ipConfigurations/eastus-gwipconfig"
+                                   }
+                                 ],
+                                 "ResourceNavigationLinks": [],
+                                 "ProvisioningState": "Succeeded"
+                               }
+                             ]
+VirtualNetworkPeeringsText : []
+ResourceGroupName          : poc-east-rg
+Location                   : eastus
+ResourceGuid               : c36a7b62-0955-4ea3-85b9-72b636544686
+Tag                        :
+TagsTable                  :
+Name                       : East-VNET
+Etag                       : W/"438031ca-8a33-4e75-a33f-bea27859592d"
+Id                         : /subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/virtualNetworks/East-VNET
+
+VERBOSE: Create Storage Account for East Region & West Region
+T09:53:40.9066337: Create Storage Account for East Region & West Region
+
+ResourceGroupName   : poc-storage-rg
+StorageAccountName  : westus9768
+Id                  : /subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-storage-rg/providers/Microsoft.Storage/storageAccounts/westus9768
+Location            : westus
+Sku                 : Microsoft.Azure.Management.Storage.Models.Sku
+Kind                : Storage
+Encryption          :
+AccessTier          :
+CreationTime        : 10/21/2016 13:53:41
+CustomDomain        :
+LastGeoFailoverTime :
+PrimaryEndpoints    : Microsoft.Azure.Management.Storage.Models.Endpoints
+PrimaryLocation     : westus
+ProvisioningState   : Succeeded
+SecondaryEndpoints  :
+SecondaryLocation   :
+StatusOfPrimary     : Available
+StatusOfSecondary   :
+Tags                : {}
+Context             : Microsoft.WindowsAzure.Commands.Common.Storage.LazyAzureStorageContext
+
+
+ResourceGroupName   : poc-storage-rg
+StorageAccountName  : eastus9768
+Id                  : /subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-storage-rg/providers/Microsoft.Storage/storageAccounts/eastus9768
+Location            : eastus
+Sku                 : Microsoft.Azure.Management.Storage.Models.Sku
+Kind                : Storage
+Encryption          :
+AccessTier          :
+CreationTime        : 10/21/2016 13:54:12
+CustomDomain        :
+LastGeoFailoverTime :
+PrimaryEndpoints    : Microsoft.Azure.Management.Storage.Models.Endpoints
+PrimaryLocation     : eastus
+ProvisioningState   : Succeeded
+SecondaryEndpoints  :
+SecondaryLocation   :
+StatusOfPrimary     : Available
+StatusOfSecondary   :
+Tags                : {}
+Context             : Microsoft.WindowsAzure.Commands.Common.Storage.LazyAzureStorageContext
+
+VERBOSE: Creates Container for VHD's (Virtual Disks)
+
+CloudBlobContainer : Microsoft.WindowsAzure.Storage.Blob.CloudBlobContainer
+Permission         : Microsoft.WindowsAzure.Storage.Blob.BlobContainerPermissions
+PublicAccess       : Off
+LastModified       : 10/21/2016 13:54:45 +00:00
+ContinuationToken  :
+Context            : Microsoft.WindowsAzure.Commands.Common.Storage.LazyAzureStorageContext
+Name               : vhds
+
+
+CloudBlobContainer : Microsoft.WindowsAzure.Storage.Blob.CloudBlobContainer
+Permission         : Microsoft.WindowsAzure.Storage.Blob.BlobContainerPermissions
+PublicAccess       : Off
+LastModified       : 10/21/2016 13:54:45 +00:00
+ContinuationToken  :
+Context            : Microsoft.WindowsAzure.Commands.Common.Storage.LazyAzureStorageContext
+Name               : vhds
+
+VERBOSE: Selecting Windows 2012R2 VM Image
+VERBOSE: Deploying a Domain Controller VM
+VERBOSE:    Setting up nic
+T09:54:48.2711831:  Setting up nic
+WARNING: The output object type of this cmdlet will be modified in a future release.
+VERBOSE:    Working on vm configuration
+T09:54:50.6941574:  Working on vm configuration
+
+ResourceGroupName        :
+Id                       :
+Name                     : dc
+Type                     :
+Location                 :
+LicenseType              :
+Tags                     :
+AvailabilitySetReference :
+DiagnosticsProfile       :
+Extensions               :
+HardwareProfile          : Microsoft.Azure.Management.Compute.Models.HardwareProfile
+InstanceView             :
+NetworkProfile           :
+OSProfile                : Microsoft.Azure.Management.Compute.Models.OSProfile
+Plan                     :
+ProvisioningState        :
+StorageProfile           :
+DataDiskNames            :
+NetworkInterfaceIDs      :
+RequestId                :
+StatusCode               : 0
+
+
+ResourceGroupName        :
+Id                       :
+Name                     : dc
+Type                     :
+Location                 :
+LicenseType              :
+Tags                     :
+AvailabilitySetReference :
+DiagnosticsProfile       :
+Extensions               :
+HardwareProfile          : Microsoft.Azure.Management.Compute.Models.HardwareProfile
+InstanceView             :
+NetworkProfile           :
+OSProfile                : Microsoft.Azure.Management.Compute.Models.OSProfile
+Plan                     :
+ProvisioningState        :
+StorageProfile           : Microsoft.Azure.Management.Compute.Models.StorageProfile
+DataDiskNames            :
+NetworkInterfaceIDs      :
+RequestId                :
+StatusCode               : 0
+
+
+ResourceGroupName        :
+Id                       :
+Name                     : dc
+Type                     :
+Location                 :
+LicenseType              :
+Tags                     :
+AvailabilitySetReference :
+DiagnosticsProfile       :
+Extensions               :
+HardwareProfile          : Microsoft.Azure.Management.Compute.Models.HardwareProfile
+InstanceView             :
+NetworkProfile           :
+OSProfile                : Microsoft.Azure.Management.Compute.Models.OSProfile
+Plan                     :
+ProvisioningState        :
+StorageProfile           : Microsoft.Azure.Management.Compute.Models.StorageProfile
+DataDiskNames            :
+NetworkInterfaceIDs      :
+RequestId                :
+StatusCode               : 0
+
+
+ResourceGroupName        :
+Id                       :
+Name                     : dc
+Type                     :
+Location                 :
+LicenseType              :
+Tags                     :
+AvailabilitySetReference :
+DiagnosticsProfile       :
+Extensions               :
+HardwareProfile          : Microsoft.Azure.Management.Compute.Models.HardwareProfile
+InstanceView             :
+NetworkProfile           :
+OSProfile                : Microsoft.Azure.Management.Compute.Models.OSProfile
+Plan                     :
+ProvisioningState        :
+StorageProfile           : Microsoft.Azure.Management.Compute.Models.StorageProfile
+DataDiskNames            : {dc-DataDisk}
+NetworkInterfaceIDs      :
+RequestId                :
+StatusCode               : 0
+
+
+ResourceGroupName        :
+Id                       :
+Name                     : dc
+Type                     :
+Location                 :
+LicenseType              :
+Tags                     :
+AvailabilitySetReference :
+DiagnosticsProfile       :
+Extensions               :
+HardwareProfile          : Microsoft.Azure.Management.Compute.Models.HardwareProfile
+InstanceView             :
+NetworkProfile           : Microsoft.Azure.Management.Compute.Models.NetworkProfile
+OSProfile                : Microsoft.Azure.Management.Compute.Models.OSProfile
+Plan                     :
+ProvisioningState        :
+StorageProfile           : Microsoft.Azure.Management.Compute.Models.StorageProfile
+DataDiskNames            : {dc-DataDisk}
+NetworkInterfaceIDs      : {/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-west-rg/providers/Microsoft.Network/networkInterfaces/dc-nic}
+RequestId                :
+StatusCode               : 0
+
+VERBOSE:    Deploying vm
+T09:54:50.8456546: Deploying vm
+
+RequestId           :
+IsSuccessStatusCode : True
+StatusCode          : OK
+ReasonPhrase        : OK
+
+VERBOSE:    Running Powershell DSC to promote vm as Domain Controller
+
+CloudBlobContainer : Microsoft.WindowsAzure.Storage.Blob.CloudBlobContainer
+Permission         : Microsoft.WindowsAzure.Storage.Blob.BlobContainerPermissions
+PublicAccess       : Container
+LastModified       : 10/21/2016 13:59:59 +00:00
+ContinuationToken  :
+Context            : Microsoft.WindowsAzure.Commands.Common.Storage.LazyAzureStorageContext
+Name               : windows-powershell-dsc
+
+
+ICloudBlob        : Microsoft.WindowsAzure.Storage.Blob.CloudBlockBlob
+BlobType          : BlockBlob
+Length            : 155077
+ContentType       : application/octet-stream
+LastModified      : 10/21/2016 14:00:00 +00:00
+SnapshotTime      :
+ContinuationToken :
+Context           : Microsoft.WindowsAzure.Commands.Common.Storage.LazyAzureStorageContext
+Name              : DCConfig.ps1.zip
+
+VERBOSE: Performing the operation "Upload 'C:\deployment\DSC\ConfigDataAD.psd1'" on target "https://westus9768.blob.core.windows.net/windows-powershell-dsc/DcConfig-4b25a80d-cc51-4e2d-9ba9-2a803a31542a.psd1".
+
+RequestId           :
+IsSuccessStatusCode : True
+StatusCode          : OK
+ReasonPhrase        : OK
+
+
+AddressSpace               : Microsoft.Azure.Commands.Network.Models.PSAddressSpace
+DhcpOptions                : Microsoft.Azure.Commands.Network.Models.PSDhcpOptions
+Subnets                    : {East-VNET-App-Subnet, GatewaySubnet}
+VirtualNetworkPeerings     : {}
+ProvisioningState          : Succeeded
+AddressSpaceText           : {
+                               "AddressPrefixes": [
+                                 "192.168.0.0/16"
+                               ]
+                             }
+DhcpOptionsText            : {
+                               "DnsServers": [
+                                 "10.0.0.4"
+                               ]
+                             }
+SubnetsText                : [
+                               {
+                                 "Name": "East-VNET-App-Subnet",
+                                 "Etag": "W/\"b2f009ef-f6a0-4a9d-8cde-dd18b2d06c2c\"",
+                                 "Id": "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/virtualNetworks/East-VNET/subnets/East-VNET-App-Subnet",
+                                 "AddressPrefix": "192.168.0.0/24",
+                                 "IpConfigurations": [],
+                                 "ResourceNavigationLinks": [],
+                                 "NetworkSecurityGroup": {
+                                   "Id": "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/networkSecurityGroups/East-SN-NSG"
+                                 },
+                                 "ProvisioningState": "Succeeded"
+                               },
+                               {
+                                 "Name": "GatewaySubnet",
+                                 "Etag": "W/\"b2f009ef-f6a0-4a9d-8cde-dd18b2d06c2c\"",
+                                 "Id": "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/virtualNetworks/East-VNET/subnets/GatewaySubnet",
+                                 "AddressPrefix": "192.168.255.0/24",
+                                 "IpConfigurations": [
+                                   {
+                                     "Id":
+                             "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/virtualNetworkGateways/eastus-vnet-Gateway/ipConfigurations/eastus-gwipconfig"
+                                   }
+                                 ],
+                                 "ResourceNavigationLinks": [],
+                                 "ProvisioningState": "Succeeded"
+                               }
+                             ]
+VirtualNetworkPeeringsText : []
+ResourceGroupName          : poc-east-rg
+Location                   : eastus
+ResourceGuid               : c36a7b62-0955-4ea3-85b9-72b636544686
+Tag                        :
+TagsTable                  :
+Name                       : East-VNET
+Etag                       : W/"b2f009ef-f6a0-4a9d-8cde-dd18b2d06c2c"
+Id                         : /subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/virtualNetworks/East-VNET
+
+
+AddressSpace               : Microsoft.Azure.Commands.Network.Models.PSAddressSpace
+DhcpOptions                : Microsoft.Azure.Commands.Network.Models.PSDhcpOptions
+Subnets                    : {West-VNET-Infrastructure-Subnet, GatewaySubnet}
+VirtualNetworkPeerings     : {}
+ProvisioningState          : Succeeded
+AddressSpaceText           : {
+                               "AddressPrefixes": [
+                                 "10.0.0.0/16"
+                               ]
+                             }
+DhcpOptionsText            : {
+                               "DnsServers": [
+                                 "10.0.0.4"
+                               ]
+                             }
+SubnetsText                : [
+                               {
+                                 "Name": "West-VNET-Infrastructure-Subnet",
+                                 "Etag": "W/\"45d84e49-4671-4a84-9f40-890cb87d7f99\"",
+                                 "Id": "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-west-rg/providers/Microsoft.Network/virtualNetworks/West-VNET/subnets/West-VNET-Infrastructure-Subnet",
+                                 "AddressPrefix": "10.0.0.0/24",
+                                 "IpConfigurations": [
+                                   {
+                                     "Id": "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-west-rg/providers/Microsoft.Network/networkInterfaces/dc-nic/ipConfigurations/ipconfig1"
+                                   }
+                                 ],
+                                 "ResourceNavigationLinks": [],
+                                 "ProvisioningState": "Succeeded"
+                               },
+                               {
+                                 "Name": "GatewaySubnet",
+                                 "Etag": "W/\"45d84e49-4671-4a84-9f40-890cb87d7f99\"",
+                                 "Id": "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-west-rg/providers/Microsoft.Network/virtualNetworks/West-VNET/subnets/GatewaySubnet",
+                                 "AddressPrefix": "10.0.255.0/24",
+                                 "IpConfigurations": [
+                                   {
+                                     "Id":
+                             "/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-west-rg/providers/Microsoft.Network/virtualNetworkGateways/westus-vnet-Gateway/ipConfigurations/westus-gwipconfig"
+                                   }
+                                 ],
+                                 "ResourceNavigationLinks": [],
+                                 "ProvisioningState": "Succeeded"
+                               }
+                             ]
+VirtualNetworkPeeringsText : []
+ResourceGroupName          : poc-west-rg
+Location                   : westus
+ResourceGuid               : 676cc8e9-e5f8-4011-82c4-1effd1d4ddc1
+Tag                        :
+TagsTable                  :
+Name                       : West-VNET
+Etag                       : W/"45d84e49-4671-4a84-9f40-890cb87d7f99"
+Id                         : /subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-west-rg/providers/Microsoft.Network/virtualNetworks/West-VNET
+
+VERBOSE: Creating Availability set for IIS load balanced set
+T10:17:23.6700034: Creating Availability set for IIS load balanced set
+VERBOSE: Deploying iis01 VM
+T10:17:24.4490025: Deploying iis01 VM
+VERBOSE:    Setting up nic
+T10:17:24.5655031:  Setting up nic
+WARNING: The output object type of this cmdlet will be modified in a future release.
+VERBOSE:    Working on vm configuration
+T10:17:26.3700026:  Working on vm configuration
+
+ResourceGroupName        :
+Id                       :
+Name                     : iis01
+Type                     :
+Location                 :
+LicenseType              :
+Tags                     :
+AvailabilitySetReference : Microsoft.Azure.Management.Compute.Models.SubResource
+DiagnosticsProfile       :
+Extensions               :
+HardwareProfile          : Microsoft.Azure.Management.Compute.Models.HardwareProfile
+InstanceView             :
+NetworkProfile           :
+OSProfile                : Microsoft.Azure.Management.Compute.Models.OSProfile
+Plan                     :
+ProvisioningState        :
+StorageProfile           :
+DataDiskNames            :
+NetworkInterfaceIDs      :
+RequestId                :
+StatusCode               : 0
+
+
+ResourceGroupName        :
+Id                       :
+Name                     : iis01
+Type                     :
+Location                 :
+LicenseType              :
+Tags                     :
+AvailabilitySetReference : Microsoft.Azure.Management.Compute.Models.SubResource
+DiagnosticsProfile       :
+Extensions               :
+HardwareProfile          : Microsoft.Azure.Management.Compute.Models.HardwareProfile
+InstanceView             :
+NetworkProfile           :
+OSProfile                : Microsoft.Azure.Management.Compute.Models.OSProfile
+Plan                     :
+ProvisioningState        :
+StorageProfile           : Microsoft.Azure.Management.Compute.Models.StorageProfile
+DataDiskNames            :
+NetworkInterfaceIDs      :
+RequestId                :
+StatusCode               : 0
+
+
+ResourceGroupName        :
+Id                       :
+Name                     : iis01
+Type                     :
+Location                 :
+LicenseType              :
+Tags                     :
+AvailabilitySetReference : Microsoft.Azure.Management.Compute.Models.SubResource
+DiagnosticsProfile       :
+Extensions               :
+HardwareProfile          : Microsoft.Azure.Management.Compute.Models.HardwareProfile
+InstanceView             :
+NetworkProfile           :
+OSProfile                : Microsoft.Azure.Management.Compute.Models.OSProfile
+Plan                     :
+ProvisioningState        :
+StorageProfile           : Microsoft.Azure.Management.Compute.Models.StorageProfile
+DataDiskNames            :
+NetworkInterfaceIDs      :
+RequestId                :
+StatusCode               : 0
+
+
+ResourceGroupName        :
+Id                       :
+Name                     : iis01
+Type                     :
+Location                 :
+LicenseType              :
+Tags                     :
+AvailabilitySetReference : Microsoft.Azure.Management.Compute.Models.SubResource
+DiagnosticsProfile       :
+Extensions               :
+HardwareProfile          : Microsoft.Azure.Management.Compute.Models.HardwareProfile
+InstanceView             :
+NetworkProfile           : Microsoft.Azure.Management.Compute.Models.NetworkProfile
+OSProfile                : Microsoft.Azure.Management.Compute.Models.OSProfile
+Plan                     :
+ProvisioningState        :
+StorageProfile           : Microsoft.Azure.Management.Compute.Models.StorageProfile
+DataDiskNames            :
+NetworkInterfaceIDs      : {/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/networkInterfaces/iis01-nic}
+RequestId                :
+StatusCode               : 0
+
+VERBOSE:    Deploying vm
+T10:17:26.5345032:  Deploying vm
+
+RequestId           :
+IsSuccessStatusCode : True
+StatusCode          : OK
+ReasonPhrase        : OK
+
+VERBOSE:    Joining VM to the domain
+T10:21:31.1491299:  Joining VM to the domain
+
+RequestId           :
+IsSuccessStatusCode : True
+StatusCode          : OK
+ReasonPhrase        : OK
+
+VERBOSE:    Running PowerShell DSC to configure VM as IIS server
+T10:22:32.2713735:  Running PowerShell DSC to configure VM as IIS server
+
+CloudBlobContainer : Microsoft.WindowsAzure.Storage.Blob.CloudBlobContainer
+Permission         : Microsoft.WindowsAzure.Storage.Blob.BlobContainerPermissions
+PublicAccess       : Container
+LastModified       : 10/21/2016 14:22:32 +00:00
+ContinuationToken  :
+Context            : Microsoft.WindowsAzure.Commands.Common.Storage.LazyAzureStorageContext
+Name               : windows-powershell-dsc
+
+
+ICloudBlob        : Microsoft.WindowsAzure.Storage.Blob.CloudBlockBlob
+BlobType          : BlockBlob
+Length            : 155077
+ContentType       : application/octet-stream
+LastModified      : 10/21/2016 14:22:32 +00:00
+SnapshotTime      :
+ContinuationToken :
+Context           : Microsoft.WindowsAzure.Commands.Common.Storage.LazyAzureStorageContext
+Name              : IISInstall.ps1.zip
+
+
+RequestId           :
+IsSuccessStatusCode : True
+StatusCode          : OK
+ReasonPhrase        : OK
+
+VERBOSE: Deploying iis02 VM
+T10:37:09.6960661: Deploying iis02 VM
+VERBOSE:    Setting up nic
+T10:37:09.7360684:  Setting up nic
+WARNING: The output object type of this cmdlet will be modified in a future release.
+VERBOSE:    Working on vm configuration
+T10:37:10.5493347:  Working on vm configuration
+
+ResourceGroupName        :
+Id                       :
+Name                     : iis02
+Type                     :
+Location                 :
+LicenseType              :
+Tags                     :
+AvailabilitySetReference : Microsoft.Azure.Management.Compute.Models.SubResource
+DiagnosticsProfile       :
+Extensions               :
+HardwareProfile          : Microsoft.Azure.Management.Compute.Models.HardwareProfile
+InstanceView             :
+NetworkProfile           :
+OSProfile                : Microsoft.Azure.Management.Compute.Models.OSProfile
+Plan                     :
+ProvisioningState        :
+StorageProfile           :
+DataDiskNames            :
+NetworkInterfaceIDs      :
+RequestId                :
+StatusCode               : 0
+
+
+ResourceGroupName        :
+Id                       :
+Name                     : iis02
+Type                     :
+Location                 :
+LicenseType              :
+Tags                     :
+AvailabilitySetReference : Microsoft.Azure.Management.Compute.Models.SubResource
+DiagnosticsProfile       :
+Extensions               :
+HardwareProfile          : Microsoft.Azure.Management.Compute.Models.HardwareProfile
+InstanceView             :
+NetworkProfile           :
+OSProfile                : Microsoft.Azure.Management.Compute.Models.OSProfile
+Plan                     :
+ProvisioningState        :
+StorageProfile           : Microsoft.Azure.Management.Compute.Models.StorageProfile
+DataDiskNames            :
+NetworkInterfaceIDs      :
+RequestId                :
+StatusCode               : 0
+
+
+ResourceGroupName        :
+Id                       :
+Name                     : iis02
+Type                     :
+Location                 :
+LicenseType              :
+Tags                     :
+AvailabilitySetReference : Microsoft.Azure.Management.Compute.Models.SubResource
+DiagnosticsProfile       :
+Extensions               :
+HardwareProfile          : Microsoft.Azure.Management.Compute.Models.HardwareProfile
+InstanceView             :
+NetworkProfile           :
+OSProfile                : Microsoft.Azure.Management.Compute.Models.OSProfile
+Plan                     :
+ProvisioningState        :
+StorageProfile           : Microsoft.Azure.Management.Compute.Models.StorageProfile
+DataDiskNames            :
+NetworkInterfaceIDs      :
+RequestId                :
+StatusCode               : 0
+
+
+ResourceGroupName        :
+Id                       :
+Name                     : iis02
+Type                     :
+Location                 :
+LicenseType              :
+Tags                     :
+AvailabilitySetReference : Microsoft.Azure.Management.Compute.Models.SubResource
+DiagnosticsProfile       :
+Extensions               :
+HardwareProfile          : Microsoft.Azure.Management.Compute.Models.HardwareProfile
+InstanceView             :
+NetworkProfile           : Microsoft.Azure.Management.Compute.Models.NetworkProfile
+OSProfile                : Microsoft.Azure.Management.Compute.Models.OSProfile
+Plan                     :
+ProvisioningState        :
+StorageProfile           : Microsoft.Azure.Management.Compute.Models.StorageProfile
+DataDiskNames            :
+NetworkInterfaceIDs      : {/subscriptions/51bf817c-66af-4ca8-bcac-13d3df80171a/resourceGroups/poc-east-rg/providers/Microsoft.Network/networkInterfaces/iis02-nic}
+RequestId                :
+StatusCode               : 0
+
+VERBOSE:    Deploying vm
+T10:37:10.5993361:  Deploying vm
+
+RequestId           :
+IsSuccessStatusCode : True
+StatusCode          : OK
+ReasonPhrase        : OK
+
+VERBOSE:    Joining VM to the domain
+T10:41:45.1131513:  Joining VM to the domain
+
+RequestId           :
+IsSuccessStatusCode : True
+StatusCode          : OK
+ReasonPhrase        : OK
+
+VERBOSE:    Running PowerShell DSC to configure VM as IIS server
+T10:42:46.3339990:  Running PowerShell DSC to configure VM as IIS server
+
+ICloudBlob        : Microsoft.WindowsAzure.Storage.Blob.CloudBlockBlob
+BlobType          : BlockBlob
+Length            : 155077
+ContentType       : application/octet-stream
+LastModified      : 10/21/2016 14:42:46 +00:00
+SnapshotTime      :
+ContinuationToken :
+Context           : Microsoft.WindowsAzure.Commands.Common.Storage.LazyAzureStorageContext
+Name              : IISInstall.ps1.zip
+
+
+RequestId           :
+IsSuccessStatusCode : True
+StatusCode          : OK
+ReasonPhrase        : OK
+
+T10:57:24.4111123: Getting current date/time...
+T10:57:24.4311132: Calculating script execution time...
+====================================================================================================
+SCRIPT COMPLETED AT:  2016-10-21-1057
+TOTAL SCRIPT EXECUTION TIME: 02:11:20.8737288
+====================================================================================================
+T11:10:11.2918542: END OF SCRIPT!
+Transcript stopped, output file is C:\Users\prestopa\PowerShellAzurePoC\PowerShell-PoC-Transcript-2016-10-21-0846.log
+
+
+**********************
+Windows PowerShell transcript end
+End time: 20161021111041
+**********************

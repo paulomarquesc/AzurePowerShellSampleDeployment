@@ -20,12 +20,81 @@
     or lawsuits, including attorneys’ fees, that arise or result from the use or distribution of the Sample Code.
     Please note: None of the conditions outlined in the disclaimer above will supersede the terms and conditions contained
     within the Premier Customer Services Description.
+.NOTES
+    AUTHOR(S): Paulo Marques
+    CONTRIBUTOR(S): Preston K. Parsard
+    KEYWORDS: PoC, Deployment, NEW 0.00.00.0008
+    
+    LICENSE:
+
+    The MIT License (MIT)
+    Copyright (c) 2016 Paulo Marques
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. 
+
+.LINK
+    https://mit-license.org/license.txt
+
+.LINK
+    https://www.powershellgallery.com/packages/WriteToLogs
 #>
+
+<#
+***************************************************************************************************************************************************************************
+REVISION/CHANGE RECORD	
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+DATE        VERSION      NAME			    E-MAIL				   CHANGE
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+19 OCT 2016 0.00.00.0001 Preston K. Parsard prestopa@microsoft.com Included New-RandomString function to automatically generate passwords and other random strings.
+....................................................................that will be used during the script, i.e. suffixes for storage account names and shared key for VNET
+....................................................................to VNET connection, load balancer dns prefix label, etc.
+19 OCT 2016 0.00.00.0002 Preston K. Parsard prestopa@microsoft.com Added code to prompt user for subscription name instead of requiring a direct hard coded update to the script
+19 OCT 2016 0.00.00.0003 Preston K. Parsard prestopa@microsoft.com Called New-RandomString function to produce unique shared key for VNET to VNET connection.
+19 OCT 2016 0.00.00.0004 Preston K. Parsard prestopa@microsoft.com Add a random infix inside the Dnslabel name to avoid conflicts with existing deployments generated from this script
+19 OCT 2016 0.00.00.0005 Preston K. Parsard prestopa@microsoft.com Create a new random string, then extract the 4 digits to use as the last characters for the storage account name for each region
+19 OCT 2016 0.00.00.0006 Preston K. Parsard prestopa@microsoft.com Added the Transciption feature from the Start-Transcript and Stop-Transcript cmdlets to record more script activity details,
+...................................................................also repositioned the log creation earlier in the script.
+19 OCT 2016 0.00.00.0007 Preston K. Parsard prestopa@microsoft.com Added an expression after script executes as a convenient option for the user to quickly remove the 'poc...' resource groups
+...................................................................if desired (for a dev/test/poc situation only).
+19 OCT 2016 0.00.00.0008 Preston K. Parsard prestopa@microsoft.com Added author, editor, keyword, license information in the .NOTES help keyword. Also added the .LINK help keyword.
+19 OCT 2016 0.00.00.0009 Preston K. Parsard prestopa@microsoft.com Added $BeginTimer variable at the start of the script so that total script execution time can be measured at script completion.
+19 OCT 2016 0.00.00.0010 Preston K. Parsard prestopa@microsoft.com Construct custom path for log files based on current user's $env:HOMEPATH directory for both the log and transcript files.
+19 OCT 2016 0.00.00.0011 Preston K. Parsard prestopa@microsoft.com Create both log and transcript files with time/date stamps included in their filenames.
+19 OCT 2016 0.00.00.0012 Preston K. Parsard prestopa@microsoft.com Added work-items (tasks) comment section to track outstanding tasks.
+19 OCT 2016 0.00.00.0013 Preston K. Parsard prestopa@microsoft.com Added region tags to accomodate collapsing sections of script to hide details or make it easier to scroll.
+19 OCT 2016 0.00.00.0014 Preston K. Parsard prestopa@microsoft.com Create prompt and responses custom object for opening logs after script completes.
+19 OCT 2016 0.00.00.0015 Preston K. Parsard prestopa@microsoft.com Add logging module: WriteToLogs.
+19 OCT 2016 0.00.00.0016 Preston K. Parsard prestopa@microsoft.com Add and display header.
+19 OCT 2016 0.00.00.0017 Preston K. Parsard prestopa@microsoft.com Format and truncate the results of the New-Guid cmdlet for a subset of random numeric and lowercase combination of characters
+19 OCT 2016 0.00.00.0018 Preston K. Parsard prestopa@microsoft.com Add a random infix (4 numeric digits) inside the Dnslabel name to avoid conflicts with existing deployments generated from this script. 
+19 OCT 2016 0.00.00.0019 Preston K. Parsard prestopa@microsoft.com Create a new random string, then extract the 4 digits to use as the last characters for the storage account name for each region.
+19 OCT 2016 0.00.00.0020 Preston K. Parsard prestopa@microsoft.com Generate a pseudo-random password based on the prefix "SAFE" to satisfy the uppercase characters complexity requirement, plus a random 
+...................................................................combination of 8 lowercase and numeric characters. As such, this meets the password complexity requirement of 3 of the 4 complexity rules,
+...................................................................while reducing the probability that an offensive word will be generated.
+19 OCT 2016 0.00.00.0021 Preston K. Parsard prestopa@microsoft.com Use previously captured plain-text password variable instead of hard-coding in script.
+19 OCT 2016 0.00.00.0021 Preston K. Parsard prestopa@microsoft.com Added footer region to calculate elapsed time, display footer message, prompt to open log and transcript files, stop transcript...
+...................................................................as well as added a commented section that can be used to decomission PoC environment for test/dev situations in order to clean up resources & reduce cost
+#>
+
+<# 
+NEW: 0.00.00.0012.Added work-items (tasks) comment section to track outstanding tasks.
+WORK ITEMS (TASKS)
+TASK: 0001 <"Task description goes here"> 
+#>
+
 $ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
 
 #----------------------------------------------------------------------------------------------------------------------
 # Functions
 #----------------------------------------------------------------------------------------------------------------------
+
+# NEW: 0.00.00.0013
+#region FUNCTIONS
+
 function Create-DSCPackage
 {
 	param
@@ -43,7 +112,7 @@ function Create-DSCPackage
     }
 	else
 	{
-		thrown "DSC path $dscScriptsFolder does not exist"
+		throw "DSC path $dscScriptsFolder does not exist"
 	}
 }
 
@@ -199,15 +268,124 @@ function Invoke-AzureRmPowershellDSCIIS
                                     -AutoUpdate -Force -Verbose
 } 
 
+# NEW: 0.00.00.0001
+Function New-RandomString
+{
+ $CombinedCharArray = @()
+ $ComplexityRuleSets = @()
+ $PasswordArray = @()
+ # PCR here means [P]assword [C]omplexity [R]equirement, so the $PCRSampleCount value represents the number of characters that will be generated for each password complexity requirement (alpha upper, lower, and numeric)
+ $PCRSampleCount = 4
+ $PCR1AlphaUpper = ([char[]]([char]65..[char]90))
+ $PCR3AlphaLower = ([char[]]([char]97..[char]122))
+ $PCR4Numeric = ([char[]]([char]48..[char]57))
+
+ # Add all of the PCR... arrays into a single consolidated array
+ $CombinedCharArray = $PCR1AlphaUpper + $PCR3AlphaLower + $PCR4Numeric
+ # This is the set of complexity rules, so it's an array of arrays
+ $ComplexityRuleSets = ($PCR1AlphaUpper, $PCR3AlphaLower, $PCR4Numeric)
+
+ # Sample 4 characters from each of the 3 complexity rule sets to generate a complete 12 character random string
+ ForEach ($ComplexityRuleSet in $ComplexityRuleSets)
+ {
+  Get-Random -InputObject $ComplexityRuleSet -Count $PCRSampleCount | ForEach-Object { $PasswordArray += $_ }
+ } #end ForEach
+
+ [string]$RandomStringWithSpaces = $PasswordArray
+ [string]$Script:RandomString = $RandomStringWithSpaces.Replace(" ","") 
+} #end Function
+
+#endregion FUNCTIONS
+
+# NEW: 0.00.00.0013
+#region INITIALIZE
 #----------------------------------------------------------------------------------------------------------------------
 # Script Start
 #----------------------------------------------------------------------------------------------------------------------
 
 # Authenticate to Azure and select a subscription
 Add-AzureRmAccount
+
+# NEW: 0.00.00.0009
+# Start time so that total script execution time can be measured at script completion.
+$BeginTimer = Get-Date -Verbose
+
+# Location Definition
+$westLocation = "westus"
+$eastLocation = "eastus"
+
+# NEW: 0.00.00.0010
+# Construct custom path for log files based on current user's $env:HOMEPATH directory for both the log and transcript files
+$LogDir = "PowerShellAzurePoC"
+$LogPath = $env:HOMEPATH + "\" + $LogDir
+If (!(Test-Path $LogPath))
+{
+ New-Item -Path $LogPath -ItemType Directory
+} #End If
+
+# NEW: 0.00.00.0011
+# Create both log and transcript files with time/date stamps included in their filenames
+$StartTime = (((get-date -format u).Substring(0,16)).Replace(" ", "-")).Replace(":","")
+$24hrTime = $StartTime.Substring(11,4)
+
+$LogFile = "PowerShell-PoC-EnvSetup" + "-" + $StartTime + ".log"
+$TranscriptFile = "PowerShell-PoC-Transcript" + "-" + $StartTime + ".log"
+$Log = Join-Path -Path $LogPath -ChildPath $LogFile
+$Transcript = Join-Path $LogPath -ChildPath $TranscriptFile
+# Create Log file
+New-Item -Path $Log -ItemType File -Verbose
+# Create Transcript file
+New-Item -Path $Transcript -ItemType File -Verbose
+
+# NEW: 0.00.00.0006.Added the Transciption feature
+Start-Transcript -Path $Transcript -IncludeInvocationHeader -Append -Verbose
+
+# NEW: 0.00.00.0014
+# Create and populate prompts object with property-value pairs
+# PROMPTS (PromptsObj)
+$PromptsObj = [PSCustomObject]@{
+ pAskToOpenLogs = "Would you like to open the deployment logs now ? [YES/NO]"
+} #end $PromptsObj
+
+# Create and populate responses object with property-value pairs
+# RESPONSES (ResponsesObj): Initialize all response variables with null value
+$ResponsesObj = [PSCustomObject]@{
+ pOpenLogsNow = $null
+} #end $ResponsesObj
+
+# NEW: 0.00.00.0015 
+# To avoid multiple versions installed on the same system, first uninstall any previously installed and loaded versions if they exist
+Uninstall-Module -Name WriteToLogs -AllVersions -ErrorAction SilentlyContinue -Verbose
+
+# If the WriteToLogs module isn't already loaded, install and import it for use later in the script for logging operations
+If (!(Get-Module -Name WriteToLogs))
+{
+ # https://www.powershellgallery.com/packages/WriteToLogs
+ Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+ Install-PackageProvider -Name Nuget -ForceBootstrap -Force 
+ Install-Module -Name WriteToLogs -Repository PSGallery -Force -Verbose
+ Import-Module -Name WriteToLogs -Verbose
+} #end If
+
+<#
+ORIGINAL: 
+Original script code commented out and replaced below for testing with proposed NEW: tag below
 $subscriptionName = "<subscription name here>"
 Select-AzureRmSubscription -SubscriptionName $subscriptionName
+#>
 
+# NEW: 0.00.00.0002
+Do
+{
+ # Subscription name
+ (Get-AzureRmSubscription).SubscriptionName
+ [string] $Subscription = Read-Host "Please enter your subscription name "
+ $Subscription = $Subscription.ToUpper()
+} #end Do
+Until (($Subscription) -ne $null)
+
+# Selects subscription based on subscription name provided in response to the prompt above
+Select-AzureRmSubscription -SubscriptionId (Get-AzureRmSubscription -SubscriptionName $Subscription).SubscriptionId
 
 ##
 ## How to obtain Azure Powershell Module Version 
@@ -217,12 +395,24 @@ Select-AzureRmSubscription -SubscriptionName $subscriptionName
 ## Get-AzureRmSubscription
 ##
 
-# Location Definition
-$westLocation = "westus"
-$eastLocation = "eastus"
+#endregion INITIALIZE
+
+# NEW: 0.00.00.0013
+#region MAIN
+
+# NEW: 0.00.00.0016
+$DelimDouble = ("=" * 100 )
+$Header = "AZURE RM POWERSHELL POC DEPLOYMENT DEMO: " + $StartTime
+
+# Display header
+Write-ToConsoleAndLog -Output $DelimDouble -Log $Log
+Write-ToConsoleAndLog -Output $Header -Log $Log
+Write-ToConsoleAndLog -Output $DelimDouble -Log $Log
 
 # Resource Group Creation
 Write-Verbose "Creating resource groups" -Verbose
+Write-WithTime -Output "Creating resource groups" -Log $Log
+
 $rgWest = New-AzureRmResourceGroup -Name "poc-west-rg" -Location $westLocation
 $rgEast = New-AzureRmResourceGroup -Name "poc-east-rg" -Location $eastLocation
 $rgStorage = New-AzureRmResourceGroup -Name "poc-storage-rg" -Location $eastLocation
@@ -242,6 +432,8 @@ $rgStorage = New-AzureRmResourceGroup -Name "poc-storage-rg" -Location $eastLoca
 
 # Subnet Creation
 Write-Verbose "Creating Subnets..." -Verbose
+Write-WithTime -Output "Creating Subnets..." -Log $Log
+
 
 # Subnets belonging to West Location
 $gwSNNameWest = "GatewaySubnet"
@@ -259,15 +451,18 @@ $AppSNEast = New-AzureRmVirtualNetworkSubnetConfig -Name $AppSNNameEast -Address
 
 # West Virtual Network Creation
 Write-Verbose "Creating west virtual network" -Verbose
+Write-WithTime -Output "Creating west virtual network" -Log $Log
 $vnetwest = New-AzureRmVirtualNetwork -Name "West-VNET" -ResourceGroupName $rgWest.ResourceGroupName -Location $westLocation -AddressPrefix "10.0.0.0/16" -Subnet $InfraSNWest,$gwSNWest
 
 Write-Verbose "Creating east virtual network" -Verbose
+Write-WithTime -Output "Creating east virtual network" -Log $Log
 $vneteast = New-AzureRmVirtualNetwork -Name "East-VNET" -ResourceGroupName $rgEast.ResourceGroupName -Location $eastLocation -AddressPrefix "192.168.0.0/16" -Subnet $AppSNEast,$gwSNEast 
 
 # Establishing VNET to VNET Connection
 
 # West side
 Write-Verbose "Establishing VNET to VNET Connection, working on west side" -Verbose
+Write-WithTime -Output "Establishing VNET to VNET Connection, working on west side" -Log $Log
 
 # Public IP Address of the West Gateway
 $gwpipWest = New-AzureRmPublicIpAddress -Name "$westLocation-gwpip" -ResourceGroupName $rgWest.ResourceGroupName -Location $westLocation -AllocationMethod Dynamic 
@@ -321,6 +516,7 @@ $EastGwPIP = (Get-AzureRmPublicIpAddress | ? { $_.id -eq $gw.IpConfigurations.pu
 
 # Connecting Gateways
 Write-Verbose "Connecting Gateways" -Verbose
+Write-WithTime -Output "Connecting Gateways" -Log $Log
 
 # Creating Local Network Gateway on West Location
 New-AzureRmLocalNetworkGateway -Name "$eastlocation-LocalNetworkGateway" -ResourceGroupName $rgWest.ResourceGroupName -Location $westlocation -GatewayIpAddress $EastGwPIP -AddressPrefix @("192.168.0.0/16")
@@ -332,7 +528,12 @@ New-AzureRmLocalNetworkGateway -Name "$westlocation-LocalNetworkGateway" -Resour
 $gatewayWest = Get-AzureRmVirtualNetworkGateway -Name "$westlocation-vnet-Gateway" -ResourceGroupName $rgWest.ResourceGroupName
 $localWest = Get-AzureRmLocalNetworkGateway -Name "$eastlocation-LocalNetworkGateway" -ResourceGroupName $rgWest.ResourceGroupName
 
-$sharedKey = "<shared key here, only lower or upper case letters and numbers>"
+# NEW: 0.00.00.0017
+# Format and truncate the results of a randomly generated subset of numeric and lowercase combination of characters
+[string]$sharedKey = (New-Guid).Guid.Replace("-","").Substring(0,8)
+
+# ORIGINAL: $sharedKey = "<shared key here, only lower or upper case letters and numbers>"
+
 New-AzureRmVirtualNetworkGatewayConnection -Name "$westlocation-gwConnection" `
                     -ResourceGroupName $rgWest.ResourceGroupName `
                     -Location $westlocation `
@@ -359,7 +560,19 @@ New-AzureRmVirtualNetworkGatewayConnection -Name "$eastlocation-gwConnection" `
 
 # Azure Load Balancer Public Ip Address
 Write-Verbose "Creating the IIS Loadbalancer" -Verbose
+Write-WithTime -Output "Creating the IIS Loadbalancer" -Log $Log
+
+# ORIGINAL: 
+<#
 $albPublicIpDNSName = "<public ip dns name>"
+$albPublicIP = New-AzureRmPublicIpAddress   -Name "albIISpip" -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocation –AllocationMethod Static -DomainNameLabel $albPublicIpDNSName
+#>
+
+# NEW: 0.00.00.0018
+# Add a random infix (4 numeric digits) inside the Dnslabel name to avoid conflicts with existing deployments generated from this script. The -pip suffix indicates this is a public IP
+New-RandomString
+$DnsLableInfix = $RandomString.SubString(8,4)
+$albPublicIpDNSName = "pociisalb-" + $DnsLabelInfix + "-pip"
 $albPublicIP = New-AzureRmPublicIpAddress   -Name "albIISpip" -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocation –AllocationMethod Static -DomainNameLabel $albPublicIpDNSName
 
 ##
@@ -401,12 +614,12 @@ $IISAlb = New-AzureRmLoadBalancer -ResourceGroupName $rgEast.ResourceGroupName `
                     -BackendAddressPool $beAddressPool  `
                     -Probe $wwwHealthProbe 
 
-
 # Public IP Address of Domain Controller - in this case we showcase that attached a server directly to a public ip address is possible
 $dcpip = New-AzureRmPublicIpAddress -Name "dcpip" -ResourceGroupName $rgWest.ResourceGroupName -Location $westLocation -AllocationMethod Dynamic
 
 # Creates NSG (Network Security Group) Rule for Domain Controller. Basically allow RDP from public network, allow all from east subnet.
 Write-Verbose "Network Security Group" -Verbose
+Write-WithTime -Output "Network Security Group" -Log $Log 
 
 $rules = @()
 
@@ -495,22 +708,32 @@ Set-AzureRmVirtualNetworkSubnetConfig -Name $AppSNNameEast -VirtualNetwork $vnet
 #-------------------------------------------------------
 
 Write-Verbose "Create Storage Account for East Region & West Region" -Verbose
+Write-WithTime -Output "Create Storage Account for East Region & West Region" -Log $Log
 
 # Storage Account Names must be unique - make sure to change it here
-$saWestName = "<storage account name>"
+# ORIGINAL: $saWestName = "<storage account name>"
+# NEW: 0.00.00.0019
+# Create a new random string, then extract the 4 digits to use as the last characters for the storage account name for each region
+New-RandomString
+$StorageAcctSuffix = $RandomString.Substring(8,4)
+$saWestName = $westLocation + $StorageAcctSuffix
 New-AzureRmStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saWestName -Location $westLocation -Type Standard_LRS -Kind Storage 
-
 # Storage Account Names must be unique - make sure to change it here
-$saEastName = "<storage account name>"
+# ORIGINAL: $saEastName = "<storage account name>"
+# NEW: 0.00.00.0019
+
+$saEastName = $eastLocation + $StorageAcctSuffix
 New-AzureRmStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saEastName -Location $eastLocation -Type Standard_LRS -Kind Storage
 
 # Creates Container for VHD's (Virtual Disks)
 Write-Verbose "Creates Container for VHD's (Virtual Disks)" -Verbose
 $saWest = Get-AzureRMStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saWestName
 $saEast = Get-AzureRMStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saEastName
+
   
 New-AzureStorageContainer -Name "vhds" -Permission Off -Context $saWest.Context -ErrorAction SilentlyContinue 
 New-AzureStorageContainer -Name "vhds" -Permission Off -Context $saEast.Context -ErrorAction SilentlyContinue
+
 
 ### End of Storage Accounts Section
 
@@ -530,6 +753,8 @@ $vmName = "dc"
 
 # VM nic
 Write-Verbose "   Setting up nic" -Verbose
+Write-WithTime -Output " Setting up nic" -Log $Log
+
 $vnet  = Get-AzureRmVirtualNetwork -ResourceGroupName $rgWest.ResourceGroupName -Name "West-Vnet"
 $subnet = Get-AzureRmVirtualNetworkSubnetConfig -Name $InfraSNNameWest -VirtualNetwork $vnet 
 
@@ -548,6 +773,7 @@ $dcnic = New-AzureRmNetworkInterface -ResourceGroupName $rgWest.ResourceGroupNam
  
 # VM Config
 Write-Verbose "   Working on vm configuration" -Verbose
+Write-WithTime -Output " Working on vm configuration" -Log $Log
 
 $vmOSDiskName = [string]::Format("{0}-OSDisk",$vmName)
 $vhdURI = [System.Uri]([string]::Format("https://{0}.blob.core.windows.net/vhds/{1}.vhd",$saWestName,$vmOSDiskName))
@@ -555,11 +781,24 @@ $vhdURI = [System.Uri]([string]::Format("https://{0}.blob.core.windows.net/vhds/
 $vmDataDiskName = [string]::Format("{0}-DataDisk",$vmName)
 $vhdDataDiskURI = [System.Uri]([string]::Format("https://{0}.blob.core.windows.net/vhds/{1}.vhd",$saWestName,$vmDataDiskName))
 
+<#
+ORIGINAL: 
 # User Name and password
 $clearTextPassword =  "<complex password here>"
 $password = ConvertTo-SecureString -String $clearTextPassword -AsPlainText -Force
 $creds = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ("localadmin", $password)
- 
+#>
+
+# NEW: 0.00.00.0020
+# Generate a pseudo-random password based on the prefix "SA", plus a random combination of lowercase and numeric characters, follewed by the suffix "FE"
+# Clear text password prefix
+$ctpPrefix = "SAFE"
+
+$clearTextPassword = $ctpPrefix + (New-Guid).Guid.Replace("-","").Substring(0,8)
+
+$password = ConvertTo-SecureString -String $clearTextPassword -AsPlainText -Force
+$creds = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ("localadmin", $password)
+
 $dc01VmConfig = New-AzureRmVMConfig -VMName $vmName -VMSize "Standard_D1"
 
 Set-AzureRmVMOperatingSystem -VM $dc01VmConfig -Windows -ComputerName $vmName -Credential $creds
@@ -569,6 +808,7 @@ Add-AzureRmVmDataDisk -VM $dc01VmConfig -Name $vmDataDiskName -DiskSizeInGB 1023
 Add-AzureRmVMNetworkInterface -VM $dc01VmConfig -Id $dcnic.Id
  
 Write-Verbose "   Deploying vm" -Verbose
+Write-WithTime -Output "Deploying vm" -Log $Log
 
 New-AzureRmVM -ResourceGroupName $rgWest.ResourceGroupName -Location $westlocation -VM $dc01VmConfig
 
@@ -600,14 +840,18 @@ Set-AzureRmVirtualNetwork -VirtualNetwork $westVnet
 # Creating Availability set for IIS load balanced set
 $IISAVSetName = "IIS-AS"
 Write-Verbose "Creating Availability set for IIS load balanced set" -Verbose
+Write-WithTime -Output "Creating Availability set for IIS load balanced set" -Log $Log
 $IISAVSet = New-AzureRmAvailabilitySet -ResourceGroupName $rgEast.ResourceGroupName -Name $IISAVSetName -Location $eastlocation  
 
 # IIS01
 $vmName = "iis01"
 Write-Verbose "Deploying $vmName VM" -Verbose 
+Write-WithTime -Output "Deploying $vmName VM" -Log $Log
 
 # VM nic
 Write-Verbose "   Setting up nic" -Verbose
+Write-WithTime -Output " Setting up nic" -Log $Log
+
 # Getting Vnet and subnet resources
 $vnet  = Get-AzureRmVirtualNetwork -ResourceGroupName $rgEast.ResourceGroupName -Name "East-Vnet"
 $AppSubnet = Get-AzureRmVirtualNetworkSubnetConfig -Name "East-VNET-App-Subnet" -VirtualNetwork $vnet
@@ -626,6 +870,7 @@ $iis01nic = New-AzureRmNetworkInterface -ResourceGroupName $rgEast.ResourceGroup
                     -DnsServer 10.0.0.4
 
 Write-Verbose "   Working on vm configuration" -Verbose
+Write-WithTime -Output " Working on vm configuration" -Log $Log
 
 $vmOSDiskName = [string]::Format("{0}-OSDisk",$vmName)
 $vhdURI = [System.Uri]([string]::Format("https://{0}.blob.core.windows.net/vhds/{1}.vhd",$saEastName,$vmOSDiskName))
@@ -638,13 +883,20 @@ Set-AzureRmVMOSDisk -VM $iisVmConfig01 -Name $vmOSDiskName -VhdUri $vhdURI -Cach
 Add-AzureRmVMNetworkInterface -VM $iisVmConfig01 -Id $iis01nic.Id
 
 Write-Verbose "   Deploying vm" -Verbose
+Write-WithTime -Output " Deploying vm" -Log $Log
 New-AzureRmVM -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocation -VM $iisVmConfig01
 
 # Joining virtual machine to the domain 
 Write-Verbose "   Joining VM to the domain" -Verbose
+Write-WithTime -Output " Joining VM to the domain" -Log $Log
 $domainName = "contosoad.com"
 $JoinDomainUserName = "contosoad\localadmin"
-$JoinDomainUserPassword = "<password here>"
+
+# ORIGINAL: $JoinDomainUserPassword = "<password here>"
+# NEW: 0.00.00.0021
+# Use existing clear text password that was captured previously
+
+$JoinDomainUserPassword = $clearTextPassword
 Set-AzureRmVmExtension -ResourceGroupName $rgEast.ResourceGroupName `
                         -ExtensionType "JsonADDomainExtension" `
                         -Name "JoinDomain" `
@@ -657,6 +909,7 @@ Set-AzureRmVmExtension -ResourceGroupName $rgEast.ResourceGroupName `
 
 # Configuring VM to hold IIS feature via Powershell DSC
 Write-Verbose "   Running PowerShell DSC to configure VM as IIS server" -Verbose
+Write-WithTime -Output " Running PowerShell DSC to configure VM as IIS server" -Log $Log
 Invoke-AzureRmPowershellDSCIIS -OutputPackageFolder c:\deployment `
                             -DscScriptsFolder c:\deployment\DSC `
                             -DscConfigFile IISInstall.ps1 `
@@ -669,7 +922,9 @@ Invoke-AzureRmPowershellDSCIIS -OutputPackageFolder c:\deployment `
 # IIS 02 VM
 $vmName = "iis02"
 Write-Verbose "Deploying $vmName VM" -Verbose 
+Write-WithTime -Output "Deploying $vmName VM" -Log $Log
 Write-Verbose "   Setting up nic" -Verbose
+Write-WithTime -Output " Setting up nic" -Log $Log
 $iis02nic = New-AzureRmNetworkInterface -ResourceGroupName $rgEast.ResourceGroupName `
                     -Location $eastLocation `
                     -Name "$vmName-nic" `
@@ -680,6 +935,8 @@ $iis02nic = New-AzureRmNetworkInterface -ResourceGroupName $rgEast.ResourceGroup
                     -DnsServer 10.0.0.4
 
 Write-Verbose "   Working on vm configuration" -Verbose
+Write-WithTime -Output " Working on vm configuration" -Log $Log
+
 $vmOSDiskName = [string]::Format("{0}-OSDisk",$vmName)
 $vhdURI = [System.Uri]([string]::Format("https://{0}.blob.core.windows.net/vhds/{1}.vhd",$saEastName,$vmOSDiskName))
  
@@ -691,10 +948,12 @@ Set-AzureRmVMOSDisk -VM $iisVmConfig02 -Name $vmOSDiskName -VhdUri $vhdURI -Cach
 Add-AzureRmVMNetworkInterface -VM $iisVmConfig02 -Id $iis02nic.Id
 
 Write-Verbose "   Deploying vm" -Verbose
+Write-WithTime -Output " Deploying vm" -Log $Log
 New-AzureRmVM -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocation -VM $iisVmConfig02
 
 # Joining virtual machine to the domain 
 Write-Verbose "   Joining VM to the domain" -Verbose
+Write-WithTime -Output " Joining VM to the domain" -Log $Log
 Set-AzureRmVmExtension -ResourceGroupName $rgEast.ResourceGroupName `
                         -ExtensionType "JsonADDomainExtension" `
                         -Name "JoinDomain" `
@@ -707,6 +966,7 @@ Set-AzureRmVmExtension -ResourceGroupName $rgEast.ResourceGroupName `
 
 # Configuring VM to hold IIS feature via Powershell DSC
 Write-Verbose "   Running PowerShell DSC to configure VM as IIS server" -Verbose
+Write-WithTime -Output " Running PowerShell DSC to configure VM as IIS server" -Log $Log
 Invoke-AzureRmPowershellDSCIIS -OutputPackageFolder c:\deployment `
                             -DscScriptsFolder c:\deployment\DSC `
                             -DscConfigFile IISInstall.ps1 `
@@ -719,3 +979,52 @@ Invoke-AzureRmPowershellDSCIIS -OutputPackageFolder c:\deployment `
 # End of IIS virtual machines
 
 ### End of Deploying VMs Section
+#endregion MAIN
+
+# NEW: 0.00.00.0022
+#region FOOTER		
+
+# Calculate elapsed time
+Write-WithTime -Output "Getting current date/time..." -Log $Log
+$StopTimer = Get-Date
+$EndTime = (((Get-Date -format u).Substring(0,16)).Replace(" ", "-")).Replace(":","")
+Write-WithTime -Output "Calculating script execution time..." -Log $Log
+$ExecutionTime = New-TimeSpan -Start $BeginTimer -End $StopTimer
+
+$Footer = "SCRIPT COMPLETED AT: "
+
+Write-ToConsoleAndLog -Output $DelimDouble -Log $Log
+Write-ToConsoleAndLog -Output "$Footer $EndTime" -Log $Log
+Write-ToConsoleAndLog -Output "TOTAL SCRIPT EXECUTION TIME: $ExecutionTime" -Log $Log
+Write-ToConsoleAndLog -Output $DelimDouble -Log $Log
+
+# Prompt to open logs
+Do 
+{
+ $ResponsesObj.pOpenLogsNow = read-host $PromptsObj.pAskToOpenLogs
+ $ResponsesObj.pOpenLogsNow = $ResponsesObj.pOpenLogsNow.ToUpper()
+}
+Until ($ResponsesObj.pOpenLogsNow -eq "Y" -OR $ResponsesObj.pOpenLogsNow -eq "YES" -OR $ResponsesObj.pOpenLogsNow -eq "N" -OR $ResponsesObj.pOpenLogsNow -eq "NO")
+
+# Exit if user does not want to continue
+if ($ResponsesObj.pOpenLogsNow -eq "Y" -OR $ResponsesObj.pOpenLogsNow -eq "YES") 
+{
+ Start-Process notepad.exe $Log
+ Start-Process notepad.exe $Transcript
+} #end if
+
+# End of script
+Write-WithTime -Output "END OF SCRIPT!" -Log $Log
+
+# Close transcript file
+Stop-Transcript -Verbose
+
+<#
+# Decommission PoC environment by removing all resource groups in sequence (synchronously)
+NOTE: [TEST-DEV / POC SCENARIOS ONLY!!!] To quickly and conveniently remove all the resources that this script generated in order to re-run the script, if there are no other resource groups with 
+'poc' in the names, you can uncomment and execute the expression below:
+#>
+
+# Get-AzureRmResourceGroup | Where-Object { $_.ResourceGroupName -match 'poc' } | Remove-AzureRmResourceGroup -Force
+
+#endregion FOOTER
