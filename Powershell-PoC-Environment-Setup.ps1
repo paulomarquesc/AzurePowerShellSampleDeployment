@@ -790,11 +790,11 @@ $creds = New-Object -TypeName System.Management.Automation.PSCredential -Argumen
 #>
 
 # NEW: 0.00.00.0020
-# Generate a pseudo-random password based on the prefix "SA", plus a random combination of lowercase and numeric characters, follewed by the suffix "FE"
+# Generate a pseudo-random password based on the prefix "Rw1", plus a random combination of lowercase and numeric characters
 # Clear text password prefix
-$ctpPrefix = "SAFE"
-
-$clearTextPassword = $ctpPrefix + (New-Guid).Guid.Replace("-","").Substring(0,8)
+$ctpPrefix = "Rw1"
+$SubstringLength = 9
+$clearTextPassword = $ctpPrefix + (New-Guid).Guid.Replace("-","").Substring(0,$SubstringLength)
 
 $password = ConvertTo-SecureString -String $clearTextPassword -AsPlainText -Force
 $creds = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ("localadmin", $password)
