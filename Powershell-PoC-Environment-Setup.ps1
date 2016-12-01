@@ -60,7 +60,7 @@ Change Log:
 * .as well as added a commented section that can be used to decomission PoC environment for test/dev situations in order to clean up resources & reduce cost
 #>
 
-$ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
+$errorActionPreference = [System.Management.Automation.ActionPreference]::Stop
 
 #----------------------------------------------------------------------------------------------------------------------
 # Functions
@@ -79,9 +79,9 @@ function Create-DSCPackage
     # Create DSC configuration archive
     if (Test-Path $dscScriptsFolder) {
         Add-Type -Assembly System.IO.Compression.FileSystem
-        $ArchiveFile = Join-Path $outputPackageFolder "$dscConfigFile.zip"
-        Remove-Item -Path $ArchiveFile -ErrorAction SilentlyContinue
-        [System.IO.Compression.ZipFile]::CreateFromDirectory($dscScriptsFolder, $ArchiveFile)
+        $archiveFile = Join-Path $outputPackageFolder "$dscConfigFile.zip"
+        Remove-Item -Path $archiveFile -ErrorAction SilentlyContinue
+        [System.IO.Compression.ZipFile]::CreateFromDirectory($dscScriptsFolder, $archiveFile)
     }
 	else
 	{
@@ -105,7 +105,7 @@ function Upload-BlobFile
         throw "File $fullFileName does not exist."
     }
 
-    $storageAccount = Get-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName -Name $StorageAccountName 
+    $storageAccount = Get-AzureRmStorageAccount -ResourceGroupName $resourceGroupName -Name $storageAccountName 
    
     if ($storageAccount -ne $null)
     {
@@ -115,11 +115,11 @@ function Upload-BlobFile
         # Uploads a file
         $blobName = [System.IO.Path]::GetFileName($fullFileName)
 
-        Set-AzureStorageBlobContent -File $fullFileName -Blob $BlobName -Container $containerName -Context $storageAccount.Context -Force
+        Set-AzureStorageBlobContent -File $fullFileName -Blob $blobName -Container $containerName -Context $storageAccount.Context -Force
     }
     else
     {
-        throw "Storage Account $storageAccountName could not be found at resource group named $ResourceGroupName"
+        throw "Storage Account $storageAccountName could not be found at resource group named $resourceGroupName"
     }
 }
 
@@ -128,28 +128,28 @@ function Invoke-AzureRmPowershellDSCAD
     param
     (
         [Parameter(Mandatory=$true)]
-        [string]$OutputPackageFolder,
+        [string]$outputPackageFolder,
 
         [Parameter(Mandatory=$true)]
-        [string]$DscScriptsFolder,
+        [string]$dscScriptsFolder,
 
         [Parameter(Mandatory=$true)]
-        [string]$DscConfigFile,
+        [string]$dscConfigFile,
 
         [Parameter(Mandatory=$true)]
-        [string]$DscConfigFunction,
+        [string]$dscConfigFunction,
 
         [Parameter(Mandatory=$false)]
         [string]$dscConfigDataFile,
 
         [Parameter(Mandatory=$true)]
-        [string]$ResourceGroupName,
+        [string]$resourceGroupName,
 
         [Parameter(Mandatory=$true)]
-        [string]$VMName,
+        [string]$vmName,
 
         [Parameter(Mandatory=$true)]
-        [string]$StagingSaName,
+        [string]$stagingSaName,
 
         [Parameter(Mandatory=$true)]
         [string]$stagingSaResourceGroupName,
@@ -166,7 +166,7 @@ function Invoke-AzureRmPowershellDSCAD
 	Create-DSCPackage -dscScriptsFolder $dscScriptsFolder -outputPackageFolder $outputPackageFolder -dscConfigFile $dscConfigFile
 
     # Uploading DSC configuration archive
-    Upload-BlobFile -storageAccountName $StagingSaName -ResourceGroupName $stagingSaResourceGroupName -containerName "windows-powershell-dsc" -fullFileName $outputPackagePath
+    Upload-BlobFile -storageAccountName $stagingSaName -ResourceGroupName $stagingSaResourceGroupName -containerName "windows-powershell-dsc" -fullFileName $outputPackagePath
 	
 	##
     ## In order to know current extension version, you can use the following cmdlet to obatin it (user must be co-admin of the subscription and a subscription in ASM mode must be set as default)
@@ -174,12 +174,12 @@ function Invoke-AzureRmPowershellDSCAD
 	##
 
     # Executing Powershell DSC Extension on VM
-    Set-AzureRmVMDscExtension   -ResourceGroupName $ResourceGroupName `
+    Set-AzureRmVMDscExtension   -ResourceGroupName $resourceGroupName `
                                 -VMName $vmName `
                                 -ArchiveBlobName "$dscConfigFile.zip" `
                                 -ArchiveStorageAccountName $stagingSaName `
                                 -ArchiveResourceGroupName $stagingSaResourceGroupName `
-                                -ConfigurationData $ConfigurationDataPath `
+                                -ConfigurationData $configurationDataPath `
                                 -ConfigurationName $dscConfigFunction `
                                 -ConfigurationArgument @{"DomainAdminCredentials"=$Credentials} `
                                 -Version "2.1" `
@@ -191,25 +191,25 @@ function Invoke-AzureRmPowershellDSCIIS
     param
     (
         [Parameter(Mandatory=$true)]
-        [string]$OutputPackageFolder,
+        [string]$outputPackageFolder,
 
         [Parameter(Mandatory=$true)]
-        [string]$DscScriptsFolder,
+        [string]$dscScriptsFolder,
 
         [Parameter(Mandatory=$true)]
-        [string]$DscConfigFile,
+        [string]$dscConfigFile,
 
         [Parameter(Mandatory=$true)]
-        [string]$DscConfigFunction,
+        [string]$dscConfigFunction,
 
         [Parameter(Mandatory=$true)]
-        [string]$ResourceGroupName,
+        [string]$resourceGroupName,
 
         [Parameter(Mandatory=$true)]
-        [string]$VMName,
+        [string]$vmName,
 
         [Parameter(Mandatory=$true)]
-        [string]$StagingSaName,
+        [string]$stagingSaName,
 
         [Parameter(Mandatory=$true)]
         [string]$stagingSaResourceGroupName
@@ -231,7 +231,7 @@ function Invoke-AzureRmPowershellDSCIIS
 	##
 
     # Executing Powershell DSC Extension on VM
-	Set-AzureRmVMDscExtension   -ResourceGroupName $ResourceGroupName `
+	Set-AzureRmVMDscExtension   -ResourceGroupName $resourceGroupName `
                                     -VMName $vmName `
                                     -ArchiveBlobName "$dscConfigFile.zip" `
                                     -ArchiveStorageAccountName $stagingSaName `
@@ -243,28 +243,28 @@ function Invoke-AzureRmPowershellDSCIIS
 
 Function New-RandomString
 {
- $CombinedCharArray = @()
- $ComplexityRuleSets = @()
- $PasswordArray = @()
+ $combinedCharArray = @()
+ $complexityRuleSets = @()
+ $passwordArray = @()
  # PCR here means [P]assword [C]omplexity [R]equirement, so the $PCRSampleCount value represents the number of characters that will be generated for each password complexity requirement (alpha upper, lower, and numeric)
- $PCRSampleCount = 4
- $PCR1AlphaUpper = ([char[]]([char]65..[char]90))
- $PCR3AlphaLower = ([char[]]([char]97..[char]122))
- $PCR4Numeric = ([char[]]([char]48..[char]57))
+ $pcrSampleCount = 4
+ $pcr1AlphaUpper = ([char[]]([char]65..[char]90))
+ $pcr3AlphaLower = ([char[]]([char]97..[char]122))
+ $pcr4Numeric = ([char[]]([char]48..[char]57))
 
  # Add all of the PCR... arrays into a single consolidated array
- $CombinedCharArray = $PCR1AlphaUpper + $PCR3AlphaLower + $PCR4Numeric
+ $combinedCharArray = $pcr1AlphaUpper + $pcr3AlphaLower + $prc4Numeric
  # This is the set of complexity rules, so it's an array of arrays
- $ComplexityRuleSets = ($PCR1AlphaUpper, $PCR3AlphaLower, $PCR4Numeric)
+ $complexityRuleSets = ($pcr1AlphaUpper, $pcr3AlphaLower, $pcr4Numeric)
 
  # Sample 4 characters from each of the 3 complexity rule sets to generate a complete 12 character random string
- ForEach ($ComplexityRuleSet in $ComplexityRuleSets)
+ ForEach ($complexityRuleSet in $complexityRuleSets)
  {
-  Get-Random -InputObject $ComplexityRuleSet -Count $PCRSampleCount | ForEach-Object { $PasswordArray += $_ }
+  Get-Random -InputObject $complexityRuleSet -Count $pcrSampleCount | ForEach-Object { $passwordArray += $_ }
  } #end ForEach
 
- [string]$RandomStringWithSpaces = $PasswordArray
- [string]$Script:RandomString = $RandomStringWithSpaces.Replace(" ","") 
+ [string]$randomStringWithSpaces = $passwordArray
+ [string]$Script:randomString = $randomStringWithSpaces.Replace(" ","") 
 } #end Function
 
 #endregion FUNCTIONS
@@ -278,28 +278,28 @@ Function New-RandomString
 Add-AzureRmAccount
 
 # Start time so that total script execution time can be measured at script completion.
-$BeginTimer = Get-Date -Verbose
+$beginTimer = Get-Date -Verbose
 
 # Location Definition
 $westLocation = "westus"
 $eastLocation = "eastus"
 
 # Construct custom path for log files based on current user's $env:HOMEPATH directory for both the log and transcript files
-$LogDir = "PowerShellAzurePoC"
-$LogPath = $env:HOMEPATH + "\" + $LogDir
-If (!(Test-Path $LogPath))
+$logDir = "PowerShellAzurePoC"
+$logPath = $env:HOMEPATH + "\" + $logDir
+If (!(Test-Path $logPath))
 {
- New-Item -Path $LogPath -ItemType Directory
+ New-Item -Path $logPath -ItemType Directory
 } #End If
 
 # Create both log and transcript files with time/date stamps included in their filenames
-$StartTime = (((get-date -format u).Substring(0,16)).Replace(" ", "-")).Replace(":","")
-$24hrTime = $StartTime.Substring(11,4)
+$startTime = (((get-date -format u).Substring(0,16)).Replace(" ", "-")).Replace(":","")
+$24hrTime = $startTime.Substring(11,4)
 
-$LogFile = "PowerShell-PoC-EnvSetup" + "-" + $StartTime + ".log"
-$TranscriptFile = "PowerShell-PoC-Transcript" + "-" + $StartTime + ".log"
-$Log = Join-Path -Path $LogPath -ChildPath $LogFile
-$Transcript = Join-Path $LogPath -ChildPath $TranscriptFile
+$logFile = "PowerShell-PoC-EnvSetup" + "-" + $startTime + ".log"
+$transcriptFile = "PowerShell-PoC-Transcript" + "-" + $startTime + ".log"
+$log = Join-Path -Path $logPath -ChildPath $logFile
+$Transcript = Join-Path $logPath -ChildPath $lranscriptFile
 # Create Log file
 New-Item -Path $Log -ItemType File -Verbose
 # Create Transcript file
@@ -308,14 +308,14 @@ New-Item -Path $Transcript -ItemType File -Verbose
 Start-Transcript -Path $Transcript -IncludeInvocationHeader -Append -Verbose
 
 # Create and populate prompts object with property-value pairs
-# PROMPTS (PromptsObj)
-$PromptsObj = [PSCustomObject]@{
+# PROMPTS (promptsObj)
+$promptsObj = [PSCustomObject]@{
  pAskToOpenLogs = "Would you like to open the deployment logs now ? [YES/NO]"
 } #end $PromptsObj
 
 # Create and populate responses object with property-value pairs
 # RESPONSES (ResponsesObj): Initialize all response variables with null value
-$ResponsesObj = [PSCustomObject]@{
+$responsesObj = [PSCustomObject]@{
  pOpenLogsNow = $null
 } #end $ResponsesObj
 
@@ -363,13 +363,13 @@ Select-AzureRmSubscription -SubscriptionId (Get-AzureRmSubscription -Subscriptio
 
 #region MAIN
 
-$DelimDouble = ("=" * 100 )
-$Header = "AZURE RM POWERSHELL POC DEPLOYMENT DEMO: " + $StartTime
+$delimDouble = ("=" * 100 )
+$Header = "AZURE RM POWERSHELL POC DEPLOYMENT DEMO: " + $startTime
 
 # Display header
-Write-ToConsoleAndLog -Output $DelimDouble -Log $Log
+Write-ToConsoleAndLog -Output $delimDouble -Log $Log
 Write-ToConsoleAndLog -Output $Header -Log $Log
-Write-ToConsoleAndLog -Output $DelimDouble -Log $Log
+Write-ToConsoleAndLog -Output $delimDouble -Log $Log
 
 # Resource Group Creation
 Write-Verbose "Creating resource groups" -Verbose
@@ -401,24 +401,24 @@ Write-WithTime -Output "Creating Subnets..." -Log $Log
 $gwSNNameWest = "GatewaySubnet"
 $gwSNWest = New-AzureRmVirtualNetworkSubnetConfig -Name $gwSNNameWest -AddressPrefix "10.0.255.0/24"
 
-$InfraSNNameWest = "West-VNET-Infrastructure-Subnet"
-$InfraSNWest = New-AzureRmVirtualNetworkSubnetConfig -Name $InfraSNNameWest -AddressPrefix "10.0.0.0/24"
+$infraSNNameWest = "West-VNET-Infrastructure-Subnet"
+$infraSNWest = New-AzureRmVirtualNetworkSubnetConfig -Name $infraSNNameWest -AddressPrefix "10.0.0.0/24"
 
 # Subnets belonging to East Location
 $gwSNNameEast = "GatewaySubnet"
 $gwSNEast = New-AzureRmVirtualNetworkSubnetConfig -Name $gwSNNameEast -AddressPrefix "192.168.255.0/24"
 
-$AppSNNameEast = "East-VNET-App-Subnet"
-$AppSNEast = New-AzureRmVirtualNetworkSubnetConfig -Name $AppSNNameEast -AddressPrefix "192.168.0.0/24"
+$appSNNameEast = "East-VNET-App-Subnet"
+$appSNEast = New-AzureRmVirtualNetworkSubnetConfig -Name $appSNNameEast -AddressPrefix "192.168.0.0/24"
 
 # West Virtual Network Creation
 Write-Verbose "Creating west virtual network" -Verbose
 Write-WithTime -Output "Creating west virtual network" -Log $Log
-$vnetwest = New-AzureRmVirtualNetwork -Name "West-VNET" -ResourceGroupName $rgWest.ResourceGroupName -Location $westLocation -AddressPrefix "10.0.0.0/16" -Subnet $InfraSNWest,$gwSNWest
+$vnetwest = New-AzureRmVirtualNetwork -Name "West-VNET" -ResourceGroupName $rgWest.ResourceGroupName -Location $westLocation -AddressPrefix "10.0.0.0/16" -Subnet $infraSNWest,$gwSNWest
 
 Write-Verbose "Creating east virtual network" -Verbose
 Write-WithTime -Output "Creating east virtual network" -Log $Log
-$vneteast = New-AzureRmVirtualNetwork -Name "East-VNET" -ResourceGroupName $rgEast.ResourceGroupName -Location $eastLocation -AddressPrefix "192.168.0.0/16" -Subnet $AppSNEast,$gwSNEast 
+$vneteast = New-AzureRmVirtualNetwork -Name "East-VNET" -ResourceGroupName $rgEast.ResourceGroupName -Location $eastLocation -AddressPrefix "192.168.0.0/16" -Subnet $appSNEast,$gwSNEast 
 
 # Establishing VNET to VNET Connection
 
@@ -470,21 +470,21 @@ New-AzureRmVirtualNetworkGateway -Name "$eastlocation-vnet-Gateway" `
 
 # Getting public ip of Gateway on West Location
 $gw = Get-AzureRmVirtualNetworkGateway -ResourcegroupName $rgWest.ResourceGroupName
-$WestGwPIP = (Get-AzureRmPublicIpAddress | ? { $_.id -eq $gw.IpConfigurations.publicipaddress.id }).IpAddress
+$westGwPIP = (Get-AzureRmPublicIpAddress | ? { $_.id -eq $gw.IpConfigurations.publicipaddress.id }).IpAddress
 
 # Getting public of Gateway on East Location
 $gw = Get-AzureRmVirtualNetworkGateway -ResourcegroupName $rgEast.ResourceGroupName
-$EastGwPIP = (Get-AzureRmPublicIpAddress | ? { $_.id -eq $gw.IpConfigurations.publicipaddress.id }).IpAddress
+$eastGwPIP = (Get-AzureRmPublicIpAddress | ? { $_.id -eq $gw.IpConfigurations.publicipaddress.id }).IpAddress
 
 # Connecting Gateways
 Write-Verbose "Connecting Gateways" -Verbose
 Write-WithTime -Output "Connecting Gateways" -Log $Log
 
 # Creating Local Network Gateway on West Location
-New-AzureRmLocalNetworkGateway -Name "$eastlocation-LocalNetworkGateway" -ResourceGroupName $rgWest.ResourceGroupName -Location $westlocation -GatewayIpAddress $EastGwPIP -AddressPrefix @("192.168.0.0/16")
+New-AzureRmLocalNetworkGateway -Name "$eastlocation-LocalNetworkGateway" -ResourceGroupName $rgWest.ResourceGroupName -Location $westlocation -GatewayIpAddress $eastGwPIP -AddressPrefix @("192.168.0.0/16")
 
 # Creating Local Network Gateway on East Location
-New-AzureRmLocalNetworkGateway -Name "$westlocation-LocalNetworkGateway" -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocation -GatewayIpAddress $WestGwPIP -AddressPrefix @("10.0.0.0/16")
+New-AzureRmLocalNetworkGateway -Name "$westlocation-LocalNetworkGateway" -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocation -GatewayIpAddress $westGwPIP -AddressPrefix @("10.0.0.0/16")
 
 # Creating West Gateway Connection
 $gatewayWest = Get-AzureRmVirtualNetworkGateway -Name "$westlocation-vnet-Gateway" -ResourceGroupName $rgWest.ResourceGroupName
@@ -492,8 +492,6 @@ $localWest = Get-AzureRmLocalNetworkGateway -Name "$eastlocation-LocalNetworkGat
 
 # Format and truncate the results of a randomly generated subset of numeric and lowercase combination of characters
 [string]$sharedKey = (New-Guid).Guid.Replace("-","").Substring(0,8)
-
-# ORIGINAL: $sharedKey = "<shared key here, only lower or upper case letters and numbers>"
 
 New-AzureRmVirtualNetworkGatewayConnection -Name "$westlocation-gwConnection" `
                     -ResourceGroupName $rgWest.ResourceGroupName `
@@ -531,8 +529,8 @@ $albPublicIP = New-AzureRmPublicIpAddress   -Name "albIISpip" -ResourceGroupName
 
 # Add a random infix (4 numeric digits) inside the Dnslabel name to avoid conflicts with existing deployments generated from this script. The -pip suffix indicates this is a public IP
 New-RandomString
-$DnsLableInfix = $RandomString.SubString(8,4)
-$albPublicIpDNSName = "pociisalb-" + $DnsLabelInfix + "-pip"
+$dnsLableInfix = $RandomString.SubString(8,4)
+$albPublicIpDNSName = "pociisalb-" + $dnsLabelInfix + "-pip"
 $albPublicIP = New-AzureRmPublicIpAddress   -Name "albIISpip" -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocation –AllocationMethod Static -DomainNameLabel $albPublicIpDNSName
 
 ##
@@ -674,13 +672,13 @@ Write-WithTime -Output "Create Storage Account for East Region & West Region" -L
 # ORIGINAL: $saWestName = "<storage account name>"
 # Create a new random string, then extract the 4 digits to use as the last characters for the storage account name for each region
 New-RandomString
-$StorageAcctSuffix = $RandomString.Substring(8,4)
-$saWestName = $westLocation + $StorageAcctSuffix
+$storageAcctSuffix = $randomString.Substring(8,4)
+$saWestName = $westLocation + $storageAcctSuffix
 New-AzureRmStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saWestName -Location $westLocation -Type Standard_LRS -Kind Storage 
 # Storage Account Names must be unique - make sure to change it here
 # ORIGINAL: $saEastName = "<storage account name>"
 
-$saEastName = $eastLocation + $StorageAcctSuffix
+$saEastName = $eastLocation + $storageAcctSuffix
 New-AzureRmStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saEastName -Location $eastLocation -Type Standard_LRS -Kind Storage
 
 # Creates Container for VHD's (Virtual Disks)
@@ -714,7 +712,7 @@ Write-Verbose "   Setting up nic" -Verbose
 Write-WithTime -Output " Setting up nic" -Log $Log
 
 $vnet  = Get-AzureRmVirtualNetwork -ResourceGroupName $rgWest.ResourceGroupName -Name "West-Vnet"
-$subnet = Get-AzureRmVirtualNetworkSubnetConfig -Name $InfraSNNameWest -VirtualNetwork $vnet 
+$subnet = Get-AzureRmVirtualNetworkSubnetConfig -Name $infraSNNameWest -VirtualNetwork $vnet 
 
 $dcnic = New-AzureRmNetworkInterface -ResourceGroupName $rgWest.ResourceGroupName `
                     -Location $westLocation `
@@ -751,7 +749,7 @@ $creds = New-Object -TypeName System.Management.Automation.PSCredential -Argumen
 # Clear text password prefix
 $ctpPrefix = "Rw1"
 $SubstringLength = 9
-$clearTextPassword = $ctpPrefix + (New-Guid).Guid.Replace("-","").Substring(0,$SubstringLength)
+$clearTextPassword = $ctpPrefix + (New-Guid).Guid.Replace("-","").Substring(0,$substringLength)
 
 $password = ConvertTo-SecureString -String $clearTextPassword -AsPlainText -Force
 $creds = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ("localadmin", $password)
@@ -860,8 +858,8 @@ Set-AzureRmVmExtension -ResourceGroupName $rgEast.ResourceGroupName `
                         -TypeHandlerVersion "1.3" `
                         -VMName $vmname `
                         -Location $eastLocation `
-                        -Settings @{ "Name" = $DomainName; "OUPath" = ""; "User" = $JoinDomainUserName; "Restart" = "true"; "Options" = 3}  `
-                        -ProtectedSettings @{"Password" = $JoinDomainUserPassword}  
+                        -Settings @{ "Name" = $DomainName; "OUPath" = ""; "User" = $joinDomainUserName; "Restart" = "true"; "Options" = 3}  `
+                        -ProtectedSettings @{"Password" = $joinDomainUserPassword}  
 
 # Configuring VM to hold IIS feature via Powershell DSC
 Write-Verbose "   Running PowerShell DSC to configure VM as IIS server" -Verbose
@@ -917,8 +915,8 @@ Set-AzureRmVmExtension -ResourceGroupName $rgEast.ResourceGroupName `
                         -TypeHandlerVersion "1.3" `
                         -VMName $vmname `
                         -Location $eastLocation `
-                        -Settings @{ "Name" = $DomainName; "OUPath" = ""; "User" = $JoinDomainUserName; "Restart" = "true"; "Options" = 3}  `
-                        -ProtectedSettings @{"Password" = $JoinDomainUserPassword}  
+                        -Settings @{ "Name" = $domainName; "OUPath" = ""; "User" = $joinDomainUserName; "Restart" = "true"; "Options" = 3}  `
+                        -ProtectedSettings @{"Password" = $joinDomainUserPassword}  
 
 # Configuring VM to hold IIS feature via Powershell DSC
 Write-Verbose "   Running PowerShell DSC to configure VM as IIS server" -Verbose
@@ -941,28 +939,28 @@ Invoke-AzureRmPowershellDSCIIS -OutputPackageFolder c:\deployment `
 
 # Calculate elapsed time
 Write-WithTime -Output "Getting current date/time..." -Log $Log
-$StopTimer = Get-Date
-$EndTime = (((Get-Date -format u).Substring(0,16)).Replace(" ", "-")).Replace(":","")
+$stopTimer = Get-Date
+$endTime = (((Get-Date -format u).Substring(0,16)).Replace(" ", "-")).Replace(":","")
 Write-WithTime -Output "Calculating script execution time..." -Log $Log
-$ExecutionTime = New-TimeSpan -Start $BeginTimer -End $StopTimer
+$executionTime = New-TimeSpan -Start $beginTimer -End $stopTimer
 
 $Footer = "SCRIPT COMPLETED AT: "
 
-Write-ToConsoleAndLog -Output $DelimDouble -Log $Log
-Write-ToConsoleAndLog -Output "$Footer $EndTime" -Log $Log
-Write-ToConsoleAndLog -Output "TOTAL SCRIPT EXECUTION TIME: $ExecutionTime" -Log $Log
-Write-ToConsoleAndLog -Output $DelimDouble -Log $Log
+Write-ToConsoleAndLog -Output $delimDouble -Log $Log
+Write-ToConsoleAndLog -Output "$Footer $endTime" -Log $Log
+Write-ToConsoleAndLog -Output "TOTAL SCRIPT EXECUTION TIME: $executionTime" -Log $Log
+Write-ToConsoleAndLog -Output $delimDouble -Log $Log
 
 # Prompt to open logs
 Do 
 {
- $ResponsesObj.pOpenLogsNow = read-host $PromptsObj.pAskToOpenLogs
- $ResponsesObj.pOpenLogsNow = $ResponsesObj.pOpenLogsNow.ToUpper()
+ $responsesObj.pOpenLogsNow = read-host $promptsObj.pAskToOpenLogs
+ $responsesObj.pOpenLogsNow = $responsesObj.pOpenLogsNow.ToUpper()
 }
-Until ($ResponsesObj.pOpenLogsNow -eq "Y" -OR $ResponsesObj.pOpenLogsNow -eq "YES" -OR $ResponsesObj.pOpenLogsNow -eq "N" -OR $ResponsesObj.pOpenLogsNow -eq "NO")
+Until ($responsesObj.pOpenLogsNow -eq "Y" -OR $responsesObj.pOpenLogsNow -eq "YES" -OR $responsesObj.pOpenLogsNow -eq "N" -OR $responsesObj.pOpenLogsNow -eq "NO")
 
 # Exit if user does not want to continue
-if ($ResponsesObj.pOpenLogsNow -eq "Y" -OR $ResponsesObj.pOpenLogsNow -eq "YES") 
+if ($responsesObj.pOpenLogsNow -eq "Y" -OR $responsesObj.pOpenLogsNow -eq "YES") 
 {
  Start-Process notepad.exe $Log
  Start-Process notepad.exe $Transcript
