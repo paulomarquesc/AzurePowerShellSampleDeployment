@@ -372,7 +372,6 @@ Write-ToConsoleAndLog -Output $Header -Log $Log
 Write-ToConsoleAndLog -Output $delimDouble -Log $Log
 
 # Resource Group Creation
-Write-Verbose "Creating resource groups" -Verbose
 Write-WithTime -Output "Creating resource groups" -Log $Log
 
 $rgWest = New-AzureRmResourceGroup -Name "poc-west-rg" -Location $westLocation
@@ -393,7 +392,6 @@ $rgStorage = New-AzureRmResourceGroup -Name "poc-storage-rg" -Location $eastLoca
 ### Start of Virtual Networks Section
 
 # Subnet Creation
-Write-Verbose "Creating Subnets..." -Verbose
 Write-WithTime -Output "Creating Subnets..." -Log $Log
 
 
@@ -412,18 +410,15 @@ $appSNNameEast = "East-VNET-App-Subnet"
 $appSNEast = New-AzureRmVirtualNetworkSubnetConfig -Name $appSNNameEast -AddressPrefix "192.168.0.0/24"
 
 # West Virtual Network Creation
-Write-Verbose "Creating west virtual network" -Verbose
 Write-WithTime -Output "Creating west virtual network" -Log $Log
 $vnetwest = New-AzureRmVirtualNetwork -Name "West-VNET" -ResourceGroupName $rgWest.ResourceGroupName -Location $westLocation -AddressPrefix "10.0.0.0/16" -Subnet $infraSNWest,$gwSNWest
 
-Write-Verbose "Creating east virtual network" -Verbose
 Write-WithTime -Output "Creating east virtual network" -Log $Log
 $vneteast = New-AzureRmVirtualNetwork -Name "East-VNET" -ResourceGroupName $rgEast.ResourceGroupName -Location $eastLocation -AddressPrefix "192.168.0.0/16" -Subnet $appSNEast,$gwSNEast 
 
 # Establishing VNET to VNET Connection
 
 # West side
-Write-Verbose "Establishing VNET to VNET Connection, working on west side" -Verbose
 Write-WithTime -Output "Establishing VNET to VNET Connection, working on west side" -Log $Log
 
 # Public IP Address of the West Gateway
@@ -436,7 +431,7 @@ $subnet = Get-AzureRmVirtualNetworkSubnetConfig -Name 'GatewaySubnet' -VirtualNe
 $gwipconfigWest = New-AzureRmVirtualNetworkGatewayIpConfig -Name "$westlocation-gwipconfig" -SubnetId $subnet.Id -PublicIpAddressId $gwpipWest.Id 
 
 # Creating West Gateway
-Write-Verbose "Creating West Gateway" -Verbose
+Write-WithTime -Output "Creating West Gateway" -Log $Log
 
 New-AzureRmVirtualNetworkGateway -Name "$westlocation-vnet-Gateway" `
                     -ResourceGroupName $rgWest.ResourceGroupName `
@@ -458,7 +453,6 @@ $subnet = Get-AzureRmVirtualNetworkSubnetConfig -Name 'GatewaySubnet' -VirtualNe
 $gwipconfigEast = New-AzureRmVirtualNetworkGatewayIpConfig -Name "$eastlocation-gwipconfig" -SubnetId $subnet.Id -PublicIpAddressId $gwpipEast.Id 
 
 #Creating East Gateway
-Write-Verbose "Creating East Gateway" -Verbose
 New-AzureRmVirtualNetworkGateway -Name "$eastlocation-vnet-Gateway" `
                     -ResourceGroupName $rgEast.ResourceGroupName `
                     -Location $eastlocation `
@@ -477,7 +471,6 @@ $gw = Get-AzureRmVirtualNetworkGateway -ResourcegroupName $rgEast.ResourceGroupN
 $eastGwPIP = (Get-AzureRmPublicIpAddress | ? { $_.id -eq $gw.IpConfigurations.publicipaddress.id }).IpAddress
 
 # Connecting Gateways
-Write-Verbose "Connecting Gateways" -Verbose
 Write-WithTime -Output "Connecting Gateways" -Log $Log
 
 # Creating Local Network Gateway on West Location
@@ -518,7 +511,6 @@ New-AzureRmVirtualNetworkGatewayConnection -Name "$eastlocation-gwConnection" `
 # Creating load balancer that will be used by IIS servers
 
 # Azure Load Balancer Public Ip Address
-Write-Verbose "Creating the IIS Loadbalancer" -Verbose
 Write-WithTime -Output "Creating the IIS Loadbalancer" -Log $Log
 
 # ORIGINAL: 
@@ -576,7 +568,6 @@ $IISAlb = New-AzureRmLoadBalancer -ResourceGroupName $rgEast.ResourceGroupName `
 $dcpip = New-AzureRmPublicIpAddress -Name "dcpip" -ResourceGroupName $rgWest.ResourceGroupName -Location $westLocation -AllocationMethod Dynamic
 
 # Creates NSG (Network Security Group) Rule for Domain Controller. Basically allow RDP from public network, allow all from east subnet.
-Write-Verbose "Network Security Group" -Verbose
 Write-WithTime -Output "Network Security Group" -Log $Log 
 
 $rules = @()
@@ -665,7 +656,6 @@ Set-AzureRmVirtualNetworkSubnetConfig -Name $AppSNNameEast -VirtualNetwork $vnet
 # Create Storage Account for East Region & West Region
 #-------------------------------------------------------
 
-Write-Verbose "Create Storage Account for East Region & West Region" -Verbose
 Write-WithTime -Output "Create Storage Account for East Region & West Region" -Log $Log
 
 # Storage Account Names must be unique - make sure to change it here
@@ -682,7 +672,7 @@ $saEastName = $eastLocation + $storageAcctSuffix
 New-AzureRmStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saEastName -Location $eastLocation -Type Standard_LRS -Kind Storage
 
 # Creates Container for VHD's (Virtual Disks)
-Write-Verbose "Creates Container for VHD's (Virtual Disks)" -Verbose
+Write-WithTime -Output "Create Container for VHD's (Virtual Disks)" -Log $Log
 $saWest = Get-AzureRMStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saWestName
 $saEast = Get-AzureRMStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saEastName
 
@@ -700,15 +690,14 @@ New-AzureStorageContainer -Name "vhds" -Permission Off -Context $saEast.Context 
 #---------------------------------------------- 
 
 # Windows 2012R2 VM Image
-Write-Verbose "Selecting Windows 2012R2 VM Image" -Verbose
+Write-WithTime -Output "Selecting Windows 2012R2 VM Image" -Log $Log 
 $vmRmImage = (Get-AzureRmVMImage -PublisherName "MicrosoftWindowsServer" -Location $westlocation -Offer "WindowsServer" -Skus "2012-R2-Datacenter" | Sort-Object -Descending -Property Version)[0]
 
 # Domain Controller
-Write-Verbose "Deploying a Domain Controller VM" -Verbose
+Write-WithTime -Output "Deploying a Domain Controller VM" -Log $Log 
 $vmName = "dc"
 
 # VM nic
-Write-Verbose "   Setting up nic" -Verbose
 Write-WithTime -Output " Setting up nic" -Log $Log
 
 $vnet  = Get-AzureRmVirtualNetwork -ResourceGroupName $rgWest.ResourceGroupName -Name "West-Vnet"
@@ -728,7 +717,6 @@ $dcnic = New-AzureRmNetworkInterface -ResourceGroupName $rgWest.ResourceGroupNam
 ##
  
 # VM Config
-Write-Verbose "   Working on vm configuration" -Verbose
 Write-WithTime -Output " Working on vm configuration" -Log $Log
 
 $vmOSDiskName = [string]::Format("{0}-OSDisk",$vmName)
@@ -761,14 +749,13 @@ Set-AzureRmVMSourceImage -VM $dc01VmConfig -PublisherName $vmRmImage.PublisherNa
 Set-AzureRmVMOSDisk -VM $dc01VmConfig -Name $vmOSDiskName -VhdUri $vhdURI -Caching ReadWrite -CreateOption fromImage
 Add-AzureRmVmDataDisk -VM $dc01VmConfig -Name $vmDataDiskName -DiskSizeInGB 1023 -VhdUri $vhdDataDiskURI -Caching None -Lun 0 -CreateOption Empty
 Add-AzureRmVMNetworkInterface -VM $dc01VmConfig -Id $dcnic.Id
- 
-Write-Verbose "   Deploying vm" -Verbose
+
 Write-WithTime -Output "Deploying vm" -Log $Log
 
 New-AzureRmVM -ResourceGroupName $rgWest.ResourceGroupName -Location $westlocation -VM $dc01VmConfig
 
 # Promoting VM to be a Domain Controller via Powershell DSC
-Write-Verbose "   Running Powershell DSC to promote vm as Domain Controller" -Verbose
+Write-WithTime -Output "   Running Powershell DSC to promote vm as Domain Controller" -Log $Log
 Invoke-AzureRmPowershellDSCAD -OutputPackageFolder c:\deployment `
                             -DscScriptsFolder c:\deployment\DSC `
                             -DscConfigFile DCConfig.ps1 `
@@ -794,17 +781,14 @@ Set-AzureRmVirtualNetwork -VirtualNetwork $westVnet
 
 # Creating Availability set for IIS load balanced set
 $IISAVSetName = "IIS-AS"
-Write-Verbose "Creating Availability set for IIS load balanced set" -Verbose
 Write-WithTime -Output "Creating Availability set for IIS load balanced set" -Log $Log
 $IISAVSet = New-AzureRmAvailabilitySet -ResourceGroupName $rgEast.ResourceGroupName -Name $IISAVSetName -Location $eastlocation  
 
 # IIS01
 $vmName = "iis01"
-Write-Verbose "Deploying $vmName VM" -Verbose 
 Write-WithTime -Output "Deploying $vmName VM" -Log $Log
 
 # VM nic
-Write-Verbose "   Setting up nic" -Verbose
 Write-WithTime -Output " Setting up nic" -Log $Log
 
 # Getting Vnet and subnet resources
@@ -824,7 +808,6 @@ $iis01nic = New-AzureRmNetworkInterface -ResourceGroupName $rgEast.ResourceGroup
                     -LoadBalancerInboundNatRule $IISAlb.InboundNatRules[0] `
                     -DnsServer 10.0.0.4
 
-Write-Verbose "   Working on vm configuration" -Verbose
 Write-WithTime -Output " Working on vm configuration" -Log $Log
 
 $vmOSDiskName = [string]::Format("{0}-OSDisk",$vmName)
@@ -837,12 +820,10 @@ Set-AzureRmVMSourceImage -VM $iisVmConfig01 -PublisherName $vmRmImage.PublisherN
 Set-AzureRmVMOSDisk -VM $iisVmConfig01 -Name $vmOSDiskName -VhdUri $vhdURI -Caching ReadWrite -CreateOption fromImage
 Add-AzureRmVMNetworkInterface -VM $iisVmConfig01 -Id $iis01nic.Id
 
-Write-Verbose "   Deploying vm" -Verbose
 Write-WithTime -Output " Deploying vm" -Log $Log
 New-AzureRmVM -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocation -VM $iisVmConfig01
 
 # Joining virtual machine to the domain 
-Write-Verbose "   Joining VM to the domain" -Verbose
 Write-WithTime -Output " Joining VM to the domain" -Log $Log
 $domainName = "contosoad.com"
 $JoinDomainUserName = "contosoad\localadmin"
@@ -862,7 +843,6 @@ Set-AzureRmVmExtension -ResourceGroupName $rgEast.ResourceGroupName `
                         -ProtectedSettings @{"Password" = $joinDomainUserPassword}  
 
 # Configuring VM to hold IIS feature via Powershell DSC
-Write-Verbose "   Running PowerShell DSC to configure VM as IIS server" -Verbose
 Write-WithTime -Output " Running PowerShell DSC to configure VM as IIS server" -Log $Log
 Invoke-AzureRmPowershellDSCIIS -OutputPackageFolder c:\deployment `
                             -DscScriptsFolder c:\deployment\DSC `
@@ -875,9 +855,7 @@ Invoke-AzureRmPowershellDSCIIS -OutputPackageFolder c:\deployment `
 
 # IIS 02 VM
 $vmName = "iis02"
-Write-Verbose "Deploying $vmName VM" -Verbose 
 Write-WithTime -Output "Deploying $vmName VM" -Log $Log
-Write-Verbose "   Setting up nic" -Verbose
 Write-WithTime -Output " Setting up nic" -Log $Log
 $iis02nic = New-AzureRmNetworkInterface -ResourceGroupName $rgEast.ResourceGroupName `
                     -Location $eastLocation `
@@ -888,7 +866,6 @@ $iis02nic = New-AzureRmNetworkInterface -ResourceGroupName $rgEast.ResourceGroup
                     -LoadBalancerInboundNatRule $IISAlb.InboundNatRules[1] `
                     -DnsServer 10.0.0.4
 
-Write-Verbose "   Working on vm configuration" -Verbose
 Write-WithTime -Output " Working on vm configuration" -Log $Log
 
 $vmOSDiskName = [string]::Format("{0}-OSDisk",$vmName)
@@ -901,12 +878,10 @@ Set-AzureRmVMSourceImage -VM $iisVmConfig02 -PublisherName $vmRmImage.PublisherN
 Set-AzureRmVMOSDisk -VM $iisVmConfig02 -Name $vmOSDiskName -VhdUri $vhdURI -Caching ReadWrite -CreateOption fromImage
 Add-AzureRmVMNetworkInterface -VM $iisVmConfig02 -Id $iis02nic.Id
 
-Write-Verbose "   Deploying vm" -Verbose
 Write-WithTime -Output " Deploying vm" -Log $Log
 New-AzureRmVM -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocation -VM $iisVmConfig02
 
 # Joining virtual machine to the domain 
-Write-Verbose "   Joining VM to the domain" -Verbose
 Write-WithTime -Output " Joining VM to the domain" -Log $Log
 Set-AzureRmVmExtension -ResourceGroupName $rgEast.ResourceGroupName `
                         -ExtensionType "JsonADDomainExtension" `
@@ -919,7 +894,6 @@ Set-AzureRmVmExtension -ResourceGroupName $rgEast.ResourceGroupName `
                         -ProtectedSettings @{"Password" = $joinDomainUserPassword}  
 
 # Configuring VM to hold IIS feature via Powershell DSC
-Write-Verbose "   Running PowerShell DSC to configure VM as IIS server" -Verbose
 Write-WithTime -Output " Running PowerShell DSC to configure VM as IIS server" -Log $Log
 Invoke-AzureRmPowershellDSCIIS -OutputPackageFolder c:\deployment `
                             -DscScriptsFolder c:\deployment\DSC `
