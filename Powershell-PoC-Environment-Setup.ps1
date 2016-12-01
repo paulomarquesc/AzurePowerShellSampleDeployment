@@ -264,7 +264,7 @@ Function New-RandomString
  } #end ForEach
 
  [string]$randomStringWithSpaces = $passwordArray
- [string]$Script:randomString = $randomStringWithSpaces.Replace(" ","") 
+ return $RandomStringWithSpaces.Replace(" ","") 
 } #end Function
 
 #endregion FUNCTIONS
@@ -671,7 +671,7 @@ Write-WithTime -Output "Create Storage Account for East Region & West Region" -L
 # Storage Account Names must be unique - make sure to change it here
 # ORIGINAL: $saWestName = "<storage account name>"
 # Create a new random string, then extract the 4 digits to use as the last characters for the storage account name for each region
-New-RandomString
+$randomString = New-RandomString
 $storageAcctSuffix = $randomString.Substring(8,4)
 $saWestName = $westLocation + $storageAcctSuffix
 New-AzureRmStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saWestName -Location $westLocation -Type Standard_LRS -Kind Storage 
