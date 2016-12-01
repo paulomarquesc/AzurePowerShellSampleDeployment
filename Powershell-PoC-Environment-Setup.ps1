@@ -66,7 +66,6 @@ $ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
 # Functions
 #----------------------------------------------------------------------------------------------------------------------
 
-# NEW: 0.00.00.0013
 #region FUNCTIONS
 
 function Create-DSCPackage
@@ -242,7 +241,6 @@ function Invoke-AzureRmPowershellDSCIIS
                                     -AutoUpdate -Force -Verbose
 } 
 
-# NEW: 0.00.00.0001
 Function New-RandomString
 {
  $CombinedCharArray = @()
@@ -271,7 +269,6 @@ Function New-RandomString
 
 #endregion FUNCTIONS
 
-# NEW: 0.00.00.0013
 #region INITIALIZE
 #----------------------------------------------------------------------------------------------------------------------
 # Script Start
@@ -280,7 +277,6 @@ Function New-RandomString
 # Authenticate to Azure and select a subscription
 Add-AzureRmAccount
 
-# NEW: 0.00.00.0009
 # Start time so that total script execution time can be measured at script completion.
 $BeginTimer = Get-Date -Verbose
 
@@ -288,7 +284,6 @@ $BeginTimer = Get-Date -Verbose
 $westLocation = "westus"
 $eastLocation = "eastus"
 
-# NEW: 0.00.00.0010
 # Construct custom path for log files based on current user's $env:HOMEPATH directory for both the log and transcript files
 $LogDir = "PowerShellAzurePoC"
 $LogPath = $env:HOMEPATH + "\" + $LogDir
@@ -297,7 +292,6 @@ If (!(Test-Path $LogPath))
  New-Item -Path $LogPath -ItemType Directory
 } #End If
 
-# NEW: 0.00.00.0011
 # Create both log and transcript files with time/date stamps included in their filenames
 $StartTime = (((get-date -format u).Substring(0,16)).Replace(" ", "-")).Replace(":","")
 $24hrTime = $StartTime.Substring(11,4)
@@ -311,10 +305,8 @@ New-Item -Path $Log -ItemType File -Verbose
 # Create Transcript file
 New-Item -Path $Transcript -ItemType File -Verbose
 
-# NEW: 0.00.00.0006.Added the Transciption feature
 Start-Transcript -Path $Transcript -IncludeInvocationHeader -Append -Verbose
 
-# NEW: 0.00.00.0014
 # Create and populate prompts object with property-value pairs
 # PROMPTS (PromptsObj)
 $PromptsObj = [PSCustomObject]@{
@@ -327,7 +319,6 @@ $ResponsesObj = [PSCustomObject]@{
  pOpenLogsNow = $null
 } #end $ResponsesObj
 
-# NEW: 0.00.00.0015 
 # To avoid multiple versions installed on the same system, first uninstall any previously installed and loaded versions if they exist
 Uninstall-Module -Name WriteToLogs -AllVersions -ErrorAction SilentlyContinue -Verbose
 
@@ -348,7 +339,6 @@ $subscriptionName = "<subscription name here>"
 Select-AzureRmSubscription -SubscriptionName $subscriptionName
 #>
 
-# NEW: 0.00.00.0002
 Do
 {
  # Subscription name
@@ -371,10 +361,8 @@ Select-AzureRmSubscription -SubscriptionId (Get-AzureRmSubscription -Subscriptio
 
 #endregion INITIALIZE
 
-# NEW: 0.00.00.0013
 #region MAIN
 
-# NEW: 0.00.00.0016
 $DelimDouble = ("=" * 100 )
 $Header = "AZURE RM POWERSHELL POC DEPLOYMENT DEMO: " + $StartTime
 
@@ -502,7 +490,6 @@ New-AzureRmLocalNetworkGateway -Name "$westlocation-LocalNetworkGateway" -Resour
 $gatewayWest = Get-AzureRmVirtualNetworkGateway -Name "$westlocation-vnet-Gateway" -ResourceGroupName $rgWest.ResourceGroupName
 $localWest = Get-AzureRmLocalNetworkGateway -Name "$eastlocation-LocalNetworkGateway" -ResourceGroupName $rgWest.ResourceGroupName
 
-# NEW: 0.00.00.0017
 # Format and truncate the results of a randomly generated subset of numeric and lowercase combination of characters
 [string]$sharedKey = (New-Guid).Guid.Replace("-","").Substring(0,8)
 
@@ -542,7 +529,6 @@ $albPublicIpDNSName = "<public ip dns name>"
 $albPublicIP = New-AzureRmPublicIpAddress   -Name "albIISpip" -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocation –AllocationMethod Static -DomainNameLabel $albPublicIpDNSName
 #>
 
-# NEW: 0.00.00.0018
 # Add a random infix (4 numeric digits) inside the Dnslabel name to avoid conflicts with existing deployments generated from this script. The -pip suffix indicates this is a public IP
 New-RandomString
 $DnsLableInfix = $RandomString.SubString(8,4)
@@ -686,7 +672,6 @@ Write-WithTime -Output "Create Storage Account for East Region & West Region" -L
 
 # Storage Account Names must be unique - make sure to change it here
 # ORIGINAL: $saWestName = "<storage account name>"
-# NEW: 0.00.00.0019
 # Create a new random string, then extract the 4 digits to use as the last characters for the storage account name for each region
 New-RandomString
 $StorageAcctSuffix = $RandomString.Substring(8,4)
@@ -694,7 +679,6 @@ $saWestName = $westLocation + $StorageAcctSuffix
 New-AzureRmStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saWestName -Location $westLocation -Type Standard_LRS -Kind Storage 
 # Storage Account Names must be unique - make sure to change it here
 # ORIGINAL: $saEastName = "<storage account name>"
-# NEW: 0.00.00.0019
 
 $saEastName = $eastLocation + $StorageAcctSuffix
 New-AzureRmStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saEastName -Location $eastLocation -Type Standard_LRS -Kind Storage
@@ -763,7 +747,6 @@ $password = ConvertTo-SecureString -String $clearTextPassword -AsPlainText -Forc
 $creds = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ("localadmin", $password)
 #>
 
-# NEW: 0.00.00.0020
 # Generate a pseudo-random password based on the prefix "Rw1", plus a random combination of lowercase and numeric characters
 # Clear text password prefix
 $ctpPrefix = "Rw1"
@@ -867,7 +850,6 @@ $domainName = "contosoad.com"
 $JoinDomainUserName = "contosoad\localadmin"
 
 # ORIGINAL: $JoinDomainUserPassword = "<password here>"
-# NEW: 0.00.00.0021
 # Use existing clear text password that was captured previously
 
 $JoinDomainUserPassword = $clearTextPassword
@@ -955,7 +937,6 @@ Invoke-AzureRmPowershellDSCIIS -OutputPackageFolder c:\deployment `
 ### End of Deploying VMs Section
 #endregion MAIN
 
-# NEW: 0.00.00.0022
 #region FOOTER		
 
 # Calculate elapsed time
