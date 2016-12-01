@@ -44,40 +44,34 @@
 #>
 
 <#
-***************************************************************************************************************************************************************************
-REVISION/CHANGE RECORD	
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-DATE        VERSION      NAME			    E-MAIL				   CHANGE
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-19 OCT 2016 0.00.00.0001 Preston K. Parsard prestopa@microsoft.com Included New-RandomString function to automatically generate passwords and other random strings.
-....................................................................that will be used during the script, i.e. suffixes for storage account names and shared key for VNET
-....................................................................to VNET connection, load balancer dns prefix label, etc.
-19 OCT 2016 0.00.00.0002 Preston K. Parsard prestopa@microsoft.com Added code to prompt user for subscription name instead of requiring a direct hard coded update to the script
-19 OCT 2016 0.00.00.0003 Preston K. Parsard prestopa@microsoft.com Called New-RandomString function to produce unique shared key for VNET to VNET connection.
-19 OCT 2016 0.00.00.0004 Preston K. Parsard prestopa@microsoft.com Add a random infix inside the Dnslabel name to avoid conflicts with existing deployments generated from this script
-19 OCT 2016 0.00.00.0005 Preston K. Parsard prestopa@microsoft.com Create a new random string, then extract the 4 digits to use as the last characters for the storage account name for each region
-19 OCT 2016 0.00.00.0006 Preston K. Parsard prestopa@microsoft.com Added the Transciption feature from the Start-Transcript and Stop-Transcript cmdlets to record more script activity details,
-...................................................................also repositioned the log creation earlier in the script.
-19 OCT 2016 0.00.00.0007 Preston K. Parsard prestopa@microsoft.com Added an expression after script executes as a convenient option for the user to quickly remove the 'poc...' resource groups
-...................................................................if desired (for a dev/test/poc situation only).
-19 OCT 2016 0.00.00.0008 Preston K. Parsard prestopa@microsoft.com Added author, editor, keyword, license information in the .NOTES help keyword. Also added the .LINK help keyword.
-19 OCT 2016 0.00.00.0009 Preston K. Parsard prestopa@microsoft.com Added $BeginTimer variable at the start of the script so that total script execution time can be measured at script completion.
-19 OCT 2016 0.00.00.0010 Preston K. Parsard prestopa@microsoft.com Construct custom path for log files based on current user's $env:HOMEPATH directory for both the log and transcript files.
-19 OCT 2016 0.00.00.0011 Preston K. Parsard prestopa@microsoft.com Create both log and transcript files with time/date stamps included in their filenames.
-19 OCT 2016 0.00.00.0012 Preston K. Parsard prestopa@microsoft.com Added work-items (tasks) comment section to track outstanding tasks.
-19 OCT 2016 0.00.00.0013 Preston K. Parsard prestopa@microsoft.com Added region tags to accomodate collapsing sections of script to hide details or make it easier to scroll.
-19 OCT 2016 0.00.00.0014 Preston K. Parsard prestopa@microsoft.com Create prompt and responses custom object for opening logs after script completes.
-19 OCT 2016 0.00.00.0015 Preston K. Parsard prestopa@microsoft.com Add logging module: WriteToLogs.
-19 OCT 2016 0.00.00.0016 Preston K. Parsard prestopa@microsoft.com Add and display header.
-19 OCT 2016 0.00.00.0017 Preston K. Parsard prestopa@microsoft.com Format and truncate the results of the New-Guid cmdlet for a subset of random numeric and lowercase combination of characters
-19 OCT 2016 0.00.00.0018 Preston K. Parsard prestopa@microsoft.com Add a random infix (4 numeric digits) inside the Dnslabel name to avoid conflicts with existing deployments generated from this script. 
-19 OCT 2016 0.00.00.0019 Preston K. Parsard prestopa@microsoft.com Create a new random string, then extract the 4 digits to use as the last characters for the storage account name for each region.
-19 OCT 2016 0.00.00.0020 Preston K. Parsard prestopa@microsoft.com Generate a pseudo-random password based on the prefix "SAFE" to satisfy the uppercase characters complexity requirement, plus a random 
-...................................................................combination of 8 lowercase and numeric characters. As such, this meets the password complexity requirement of 3 of the 4 complexity rules,
-...................................................................while reducing the probability that an offensive word will be generated.
-19 OCT 2016 0.00.00.0021 Preston K. Parsard prestopa@microsoft.com Use previously captured plain-text password variable instead of hard-coding in script.
-19 OCT 2016 0.00.00.0021 Preston K. Parsard prestopa@microsoft.com Added footer region to calculate elapsed time, display footer message, prompt to open log and transcript files, stop transcript...
-...................................................................as well as added a commented section that can be used to decomission PoC environment for test/dev situations in order to clean up resources & reduce cost
+Change Log:
+
+* Included New-RandomString function to automatically generate passwords and other random strings. that will be used during the script, i.e. suffixes for storage account names and shared key for VNET
+ .to VNET connection, load balancer dns prefix label, etc.
+* Added code to prompt user for subscription name instead of requiring a direct hard coded update to the script
+* Called New-RandomString function to produce unique shared key for VNET to VNET connection.
+* Add a random infix inside the Dnslabel name to avoid conflicts with existing deployments generated from this script
+* Create a new random string, then extract the 4 digits to use as the last characters for the storage account name for each region
+* Added the Transciption feature from the Start-Transcript and Stop-Transcript cmdlets to record more script activity details, also repositioned the log creation earlier in the script.
+* Added an expression after script executes as a convenient option for the user to quickly remove the 'poc...' resource groups if desired (for a dev/test/poc situation only).
+* Added author, editor, keyword, license information in the .NOTES help keyword. Also added the .LINK help keyword.
+* Added $BeginTimer variable at the start of the script so that total script execution time can be measured at script completion.
+* Construct custom path for log files based on current user's $env:HOMEPATH directory for both the log and transcript files.
+* Create both log and transcript files with time/date stamps included in their filenames.
+* Added work-items (tasks) comment section to track outstanding tasks.
+* Added region tags to accomodate collapsing sections of script to hide details or make it easier to scroll.
+* Create prompt and responses custom object for opening logs after script completes.
+* Add logging module: WriteToLogs.
+* Add and display header.
+* Format and truncate the results of the New-Guid cmdlet for a subset of random numeric and lowercase combination of characters
+* Add a random infix (4 numeric digits) inside the Dnslabel name to avoid conflicts with existing deployments generated from this script. 
+* Create a new random string, then extract the 4 digits to use as the last characters for the storage account name for each region.
+* Generate a pseudo-random password based on the prefix "SAFE" to satisfy the uppercase characters complexity requirement, plus a random 
+* .combination of 8 lowercase and numeric characters. As such, this meets the password complexity requirement of 3 of the 4 complexity rules,
+* .while reducing the probability that an offensive word will be generated.
+* Use previously captured plain-text password variable instead of hard-coding in script.
+* Added footer region to calculate elapsed time, display footer message, prompt to open log and transcript files, stop transcript...
+* .as well as added a commented section that can be used to decomission PoC environment for test/dev situations in order to clean up resources & reduce cost
 #>
 
 <# 
