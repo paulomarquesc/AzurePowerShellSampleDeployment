@@ -60,12 +60,6 @@ Change Log:
 * .as well as added a commented section that can be used to decomission PoC environment for test/dev situations in order to clean up resources & reduce cost
 #>
 
-<# 
-NEW: 0.00.00.0012.Added work-items (tasks) comment section to track outstanding tasks.
-WORK ITEMS (TASKS)
-TASK: 0001 <"Task description goes here"> 
-#>
-
 $ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
 
 #----------------------------------------------------------------------------------------------------------------------
