@@ -24,20 +24,6 @@
     AUTHOR(S): Paulo Marques
     CONTRIBUTOR(S): Preston K. Parsard
     KEYWORDS: PoC, Deployment, NEW 0.00.00.0008
-    
-    LICENSE:
-
-    The MIT License (MIT)
-    Copyright (c) 2016 Paulo Marques
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. 
-
-.LINK
-    https://mit-license.org/license.txt
 
 .LINK
     https://www.powershellgallery.com/packages/WriteToLogs
