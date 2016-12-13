@@ -264,7 +264,8 @@ Function New-RandomString
  } #end ForEach
 
  [string]$randomStringWithSpaces = $passwordArray
- return $RandomStringWithSpaces.Replace(" ","") 
+ $RandomString = $RandomStringWithSpaces.Replace(" ","")
+ return $RandomString
 } #end Function
 
 #endregion FUNCTIONS
@@ -393,7 +394,6 @@ $rgStorage = New-AzureRmResourceGroup -Name "poc-storage-rg" -Location $eastLoca
 
 # Subnet Creation
 Write-WithTime -Output "Creating Subnets..." -Log $Log
-
 
 # Subnets belonging to West Location
 $gwSNNameWest = "GatewaySubnet"
