@@ -343,8 +343,11 @@ Select-AzureRmSubscription -SubscriptionName $subscriptionName
 Do
 {
  # Subscription name
- (Get-AzureRmSubscription).SubscriptionName
- [string] $Subscription = Read-Host "Please enter your subscription name "
+ $defaultSubscription = (Get-AzureRmSubscription).SubscriptionName
+ Write-ToConsoleAndLog -Output "Default subsription found is: $defaultSubscription" -Log $Log
+ $subscriptionPrompt = "Please enter your subscription name "
+ Write-ToConsoleAndLog -Output $subcriptionPrompt -Log $Log
+ [string] $Subscription = Read-Host $subscriptionPrompt
  $Subscription = $Subscription.ToUpper()
 } #end Do
 Until (($Subscription) -ne $null)
