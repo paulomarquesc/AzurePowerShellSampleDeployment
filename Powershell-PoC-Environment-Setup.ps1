@@ -300,7 +300,7 @@ $24hrTime = $startTime.Substring(11,4)
 $logFile = "PowerShell-PoC-EnvSetup" + "-" + $startTime + ".log"
 $transcriptFile = "PowerShell-PoC-Transcript" + "-" + $startTime + ".log"
 $log = Join-Path -Path $logPath -ChildPath $logFile
-$Transcript = Join-Path $logPath -ChildPath $lranscriptFile
+$Transcript = Join-Path $logPath -ChildPath $transcriptFile
 # Create Log file
 New-Item -Path $Log -ItemType File -Verbose
 # Create Transcript file
