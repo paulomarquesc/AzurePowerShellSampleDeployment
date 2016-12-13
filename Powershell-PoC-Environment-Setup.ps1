@@ -733,14 +733,14 @@ $password = ConvertTo-SecureString -String $clearTextPassword -AsPlainText -Forc
 $creds = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ("localadmin", $password)
 #>
 
-# Generate a pseudo-random password based on the prefix "Rw1", plus a random combination of lowercase and numeric characters
-# Clear text password prefix
-$ctpPrefix = "Rw1"
-$SubstringLength = 9
-$clearTextPassword = $ctpPrefix + (New-Guid).Guid.Replace("-","").Substring(0,$substringLength)
+<#
+PROPOSED:
+$cred = Get-Credential -UserName $UniversalAdmName -Message "Enter password for user: $UniversalAdmName"
+# $UniversalPW = $cred.GetNetworkCredential().password
+#>
 
-$password = ConvertTo-SecureString -String $clearTextPassword -AsPlainText -Force
-$creds = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ("localadmin", $password)
+$locAdmin = "localadmin"
+$creds = Get-Credential -UserName $locAdmin -Message "Enter password for user: $locAdmin"
 
 $dc01VmConfig = New-AzureRmVMConfig -VMName $vmName -VMSize "Standard_D1"
 
