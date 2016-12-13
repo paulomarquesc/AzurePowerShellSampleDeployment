@@ -523,7 +523,7 @@ $albPublicIP = New-AzureRmPublicIpAddress   -Name "albIISpip" -ResourceGroupName
 #>
 
 # Add a random infix (4 numeric digits) inside the Dnslabel name to avoid conflicts with existing deployments generated from this script. The -pip suffix indicates this is a public IP
-New-RandomString
+$RandomString = New-RandomString
 $dnsLableInfix = $RandomString.SubString(8,4)
 $albPublicIpDNSName = "pociisalb-" + $dnsLabelInfix + "-pip"
 $albPublicIP = New-AzureRmPublicIpAddress   -Name "albIISpip" -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocation –AllocationMethod Static -DomainNameLabel $albPublicIpDNSName
