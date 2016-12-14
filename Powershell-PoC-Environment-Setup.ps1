@@ -346,7 +346,7 @@ Do
  $defaultSubscription = (Get-AzureRmSubscription).SubscriptionName
  Write-ToConsoleAndLog -Output "Default subsription found is: $defaultSubscription" -Log $Log
  $subscriptionPrompt = "Please enter your subscription name "
- Write-ToConsoleAndLog -Output $subcriptionPrompt -Log $Log
+ Write-ToLogOnly -Output $subscriptionPrompt -Log $Log
  [string] $Subscription = Read-Host $subscriptionPrompt
  $Subscription = $Subscription.ToUpper()
 } #end Do
@@ -834,7 +834,9 @@ $JoinDomainUserName = "contosoad\localadmin"
 # ORIGINAL: $JoinDomainUserPassword = "<password here>"
 # Use existing clear text password that was captured previously
 
-$JoinDomainUserPassword = $clearTextPassword
+# ORIGINAL: $JoinDomainUserPassword = $clearTextPassword 
+# Removed in favor of using the $cred.GetNetworkCredential().Password property
+
 Set-AzureRmVmExtension -ResourceGroupName $rgEast.ResourceGroupName `
                         -ExtensionType "JsonADDomainExtension" `
                         -Name "JoinDomain" `
@@ -842,8 +844,8 @@ Set-AzureRmVmExtension -ResourceGroupName $rgEast.ResourceGroupName `
                         -TypeHandlerVersion "1.3" `
                         -VMName $vmname `
                         -Location $eastLocation `
-                        -Settings @{ "Name" = $DomainName; "OUPath" = ""; "User" = $joinDomainUserName; "Restart" = "true"; "Options" = 3}  `
-                        -ProtectedSettings @{"Password" = $joinDomainUserPassword}  
+                        -Settings @{ "Name" = $DomainName; "OUPath" = ""; "User" = $JoinDomainUserName; "Restart" = "true"; "Options" = 3}  `
+                        -ProtectedSettings @{"Password" = "$($creds.GetNetworkCredential().Password)"}  
 
 # Configuring VM to hold IIS feature via Powershell DSC
 Write-WithTime -Output " Running PowerShell DSC to configure VM as IIS server" -Log $Log
@@ -894,7 +896,7 @@ Set-AzureRmVmExtension -ResourceGroupName $rgEast.ResourceGroupName `
                         -VMName $vmname `
                         -Location $eastLocation `
                         -Settings @{ "Name" = $domainName; "OUPath" = ""; "User" = $joinDomainUserName; "Restart" = "true"; "Options" = 3}  `
-                        -ProtectedSettings @{"Password" = $joinDomainUserPassword}  
+                        -ProtectedSettings @{"Password" = "$($creds.GetNetworkCredential().Password)"}  
 
 # Configuring VM to hold IIS feature via Powershell DSC
 Write-WithTime -Output " Running PowerShell DSC to configure VM as IIS server" -Log $Log
