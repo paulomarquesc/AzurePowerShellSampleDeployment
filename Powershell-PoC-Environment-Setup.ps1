@@ -835,7 +835,7 @@ $JoinDomainUserName = "contosoad\localadmin"
 # Use existing clear text password that was captured previously
 
 # ORIGINAL: $JoinDomainUserPassword = $clearTextPassword 
-# Removed in favor of using the $cred.GetNetworkCredential().Password property
+# Replaced $JoinDomainUserPassword with $cred.GetNetworkCredential().Password property in...
 
 Set-AzureRmVmExtension -ResourceGroupName $rgEast.ResourceGroupName `
                         -ExtensionType "JsonADDomainExtension" `
