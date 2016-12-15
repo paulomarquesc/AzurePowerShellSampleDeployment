@@ -53,12 +53,11 @@ Change Log:
 * Format and truncate the results of the New-Guid cmdlet for a subset of random numeric and lowercase combination of characters
 * Add a random infix (4 numeric digits) inside the Dnslabel name to avoid conflicts with existing deployments generated from this script. 
 * Create a new random string, then extract the 4 digits to use as the last characters for the storage account name for each region.
-* Generate a pseudo-random password based on the prefix "SAFE" to satisfy the uppercase characters complexity requirement, plus a random 
-* .combination of 8 lowercase and numeric characters. As such, this meets the password complexity requirement of 3 of the 4 complexity rules,
-* .while reducing the probability that an offensive word will be generated.
 * Use previously captured plain-text password variable instead of hard-coding in script.
 * Added footer region to calculate elapsed time, display footer message, prompt to open log and transcript files, stop transcript...
 * .as well as added a commented section that can be used to decomission PoC environment for test/dev situations in order to clean up resources & reduce cost
+* Removed test based commenting
+* Added #Requires -Version 5.0 to support new package management features, which will download required modules from www.powershellgallery.com
 #>
 
 $errorActionPreference = [System.Management.Automation.ActionPreference]::Stop
