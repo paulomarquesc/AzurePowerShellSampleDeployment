@@ -58,6 +58,7 @@ Change Log:
 * .as well as added a commented section that can be used to decomission PoC environment for test/dev situations in order to clean up resources & reduce cost
 * Removed test based commenting
 * Added #Requires -Version 5.0 to support new package management features, which will download required modules from www.powershellgallery.com
+* Added the requirement in the description to include the c:\deployment folder for DSC resources, package and artifacts
 #>
 
 $errorActionPreference = [System.Management.Automation.ActionPreference]::Stop
