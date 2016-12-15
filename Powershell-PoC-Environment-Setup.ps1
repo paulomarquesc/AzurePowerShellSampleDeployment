@@ -23,7 +23,7 @@
 .NOTES
     AUTHOR(S): Paulo Marques
     CONTRIBUTOR(S): Preston K. Parsard
-    KEYWORDS: PoC, Deployment, NEW 0.00.00.0008
+    KEYWORDS: PoC, Deployment
 
 .LINK
     https://www.powershellgallery.com/packages/WriteToLogs
@@ -321,24 +321,17 @@ $responsesObj = [PSCustomObject]@{
 } #end $ResponsesObj
 
 # To avoid multiple versions installed on the same system, first uninstall any previously installed and loaded versions if they exist
-Uninstall-Module -Name WriteToLogs -AllVersions -ErrorAction SilentlyContinue -Verbose
-
-# If the WriteToLogs module isn't already loaded, install and import it for use later in the script for logging operations
-If (!(Get-Module -Name WriteToLogs))
+If (Get-Module | Where-Object { $_.Name -eq 'WriteToLogs'})
 {
- # https://www.powershellgallery.com/packages/WriteToLogs
- Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
- Install-PackageProvider -Name Nuget -ForceBootstrap -Force 
- Install-Module -Name WriteToLogs -Repository PSGallery -Force -Verbose
- Import-Module -Name WriteToLogs -Verbose
-} #end If
+ Uninstall-Module -Name WriteToLogs -AllVersions -ErrorAction SilentlyContinue -Verbose
+} #end if
 
-<#
-ORIGINAL: 
-Original script code commented out and replaced below for testing with proposed NEW: tag below
-$subscriptionName = "<subscription name here>"
-Select-AzureRmSubscription -SubscriptionName $subscriptionName
-#>
+# Next, install and import it for use later in the script for logging operations
+# https://www.powershellgallery.com/packages/WriteToLogs
+Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+Install-PackageProvider -Name Nuget -ForceBootstrap -Force 
+Install-Module -Name WriteToLogs -Repository PSGallery -Force -Verbose
+Import-Module -Name WriteToLogs -Verbose
 
 Do
 {
@@ -516,12 +509,6 @@ New-AzureRmVirtualNetworkGatewayConnection -Name "$eastlocation-gwConnection" `
 # Azure Load Balancer Public Ip Address
 Write-WithTime -Output "Creating the IIS Loadbalancer" -Log $Log
 
-# ORIGINAL: 
-<#
-$albPublicIpDNSName = "<public ip dns name>"
-$albPublicIP = New-AzureRmPublicIpAddress   -Name "albIISpip" -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocation –AllocationMethod Static -DomainNameLabel $albPublicIpDNSName
-#>
-
 # Add a random infix (4 numeric digits) inside the Dnslabel name to avoid conflicts with existing deployments generated from this script. The -pip suffix indicates this is a public IP
 $RandomString = New-RandomString
 $dnsLableInfix = $RandomString.SubString(8,4)
@@ -661,15 +648,11 @@ Set-AzureRmVirtualNetworkSubnetConfig -Name $AppSNNameEast -VirtualNetwork $vnet
 
 Write-WithTime -Output "Create Storage Account for East Region & West Region" -Log $Log
 
-# Storage Account Names must be unique - make sure to change it here
-# ORIGINAL: $saWestName = "<storage account name>"
 # Create a new random string, then extract the 4 digits to use as the last characters for the storage account name for each region
 $randomString = New-RandomString
 $storageAcctSuffix = $randomString.Substring(8,4)
 $saWestName = $westLocation + $storageAcctSuffix
 New-AzureRmStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saWestName -Location $westLocation -Type Standard_LRS -Kind Storage 
-# Storage Account Names must be unique - make sure to change it here
-# ORIGINAL: $saEastName = "<storage account name>"
 
 $saEastName = $eastLocation + $storageAcctSuffix
 New-AzureRmStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saEastName -Location $eastLocation -Type Standard_LRS -Kind Storage
@@ -682,7 +665,6 @@ $saEast = Get-AzureRMStorageAccount -ResourceGroupName $rgStorage.ResourceGroupN
   
 New-AzureStorageContainer -Name "vhds" -Permission Off -Context $saWest.Context -ErrorAction SilentlyContinue 
 New-AzureStorageContainer -Name "vhds" -Permission Off -Context $saEast.Context -ErrorAction SilentlyContinue
-
 
 ### End of Storage Accounts Section
 
@@ -727,20 +709,6 @@ $vhdURI = [System.Uri]([string]::Format("https://{0}.blob.core.windows.net/vhds/
 
 $vmDataDiskName = [string]::Format("{0}-DataDisk",$vmName)
 $vhdDataDiskURI = [System.Uri]([string]::Format("https://{0}.blob.core.windows.net/vhds/{1}.vhd",$saWestName,$vmDataDiskName))
-
-<#
-ORIGINAL: 
-# User Name and password
-$clearTextPassword =  "<complex password here>"
-$password = ConvertTo-SecureString -String $clearTextPassword -AsPlainText -Force
-$creds = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ("localadmin", $password)
-#>
-
-<#
-PROPOSED:
-$cred = Get-Credential -UserName $UniversalAdmName -Message "Enter password for user: $UniversalAdmName"
-# $UniversalPW = $cred.GetNetworkCredential().password
-#>
 
 $locAdmin = "localadmin"
 $creds = Get-Credential -UserName $locAdmin -Message "Enter password for user: $locAdmin"
@@ -830,12 +798,6 @@ New-AzureRmVM -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocati
 Write-WithTime -Output " Joining VM to the domain" -Log $Log
 $domainName = "contosoad.com"
 $JoinDomainUserName = "contosoad\localadmin"
-
-# ORIGINAL: $JoinDomainUserPassword = "<password here>"
-# Use existing clear text password that was captured previously
-
-# ORIGINAL: $JoinDomainUserPassword = $clearTextPassword 
-# Replaced $JoinDomainUserPassword with $cred.GetNetworkCredential().Password property in...
 
 Set-AzureRmVmExtension -ResourceGroupName $rgEast.ResourceGroupName `
                         -ExtensionType "JsonADDomainExtension" `
