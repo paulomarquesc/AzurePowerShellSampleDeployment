@@ -1,4 +1,5 @@
-﻿<#
+﻿#Requires -Version 5.0
+<#
 .SYNOPSIS
     POC-Environment-Setup.ps1 - Script that configures the PoC environment for Azure Fast Start for IaaS.
 .DESCRIPTION
