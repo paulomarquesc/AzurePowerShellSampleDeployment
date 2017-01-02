@@ -650,12 +650,27 @@ Set-AzureRmVirtualNetworkSubnetConfig -Name $AppSNNameEast -VirtualNetwork $vnet
 Write-WithTime -Output "Create Storage Account for East Region & West Region" -Log $Log
 
 # Create a new random string, then extract the 4 digits to use as the last characters for the storage account name for each region
-$randomString = New-RandomString
-$storageAcctSuffix = $randomString.Substring(8,4)
-$saWestName = $westLocation + $storageAcctSuffix
+# If the storage account name has already been taken, i.e. not available, continue to generate a new name that can be used
+Do 
+{
+ $randomString = New-RandomString
+ $storageAcctSuffix = $randomString.Substring(8,4)
+ $saWestName = $westLocation + $storageAcctSuffix
+} #end while
+While (!((Get-AzureRmStorageAccountNameAvailability -Name $saWestName).NameAvailable)) 
+
 New-AzureRmStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saWestName -Location $westLocation -Type Standard_LRS -Kind Storage 
 
-$saEastName = $eastLocation + $storageAcctSuffix
+# Create a new random string, then extract the 4 digits to use as the last characters for the storage account name for each region
+# If the storage account name has already been taken, i.e. not available, continue to generate a new name that can be used
+Do 
+{
+ $randomString = New-RandomString
+ $storageAcctSuffix = $randomString.Substring(8,4)
+ $saEastName = $eastLocation + $storageAcctSuffix
+} #end while
+While (!((Get-AzureRmStorageAccountNameAvailability -Name $saEastName).NameAvailable)) 
+
 New-AzureRmStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saEastName -Location $eastLocation -Type Standard_LRS -Kind Storage
 
 # Creates Container for VHD's (Virtual Disks)
