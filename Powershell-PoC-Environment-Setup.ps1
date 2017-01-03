@@ -654,8 +654,7 @@ Write-WithTime -Output "Create Storage Account for East Region & West Region" -L
 Do 
 {
  $randomString = New-RandomString
- $storageAcctSuffix = $randomString.Substring(8,4)
- $saWestName = $westLocation + $storageAcctSuffix
+ $saWestName  = $randomString.Substring(4,8)
 } #end while
 While (!((Get-AzureRmStorageAccountNameAvailability -Name $saWestName).NameAvailable)) 
 
@@ -666,8 +665,7 @@ New-AzureRmStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name 
 Do 
 {
  $randomString = New-RandomString
- $storageAcctSuffix = $randomString.Substring(8,4)
- $saEastName = $eastLocation + $storageAcctSuffix
+ $saEastName = $randomString.Substring(4,8)
 } #end while
 While (!((Get-AzureRmStorageAccountNameAvailability -Name $saEastName).NameAvailable)) 
 
