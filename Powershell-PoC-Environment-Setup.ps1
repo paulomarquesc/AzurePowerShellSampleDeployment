@@ -59,6 +59,10 @@ Change Log:
 * Removed test based commenting
 * Added #Requires -Version 5.0 to support new package management features, which will download required modules from www.powershellgallery.com
 * Added the requirement in the description to include the c:\deployment folder for DSC resources, package and artifacts
+* Updated script to use managed disks instead of unmanaged for VM OS and data disks 
+* Prompt for credentials with the $creds variable earlier in the script within the INITIALIZATION region before the main script, right after prompting for the subscription name
+  This allows to the operator to quickly specify all required user parameters without having to wait for a long period before looking for an interacting again with the script for it to continue. 
+* Replaced Standard_D1 size with Standard_D1_v2 since performance is better and cost is the same.
 #>
 
 $errorActionPreference = [System.Management.Automation.ActionPreference]::Stop
@@ -348,6 +352,10 @@ Until (($Subscription) -ne $null)
 
 # Selects subscription based on subscription name provided in response to the prompt above
 Select-AzureRmSubscription -SubscriptionId (Get-AzureRmSubscription -SubscriptionName $Subscription).SubscriptionId
+
+# Prompt for credentials
+$locAdmin = "localadmin"
+$creds = Get-Credential -UserName $locAdmin -Message "Enter password for user: $locAdmin"
 
 ##
 ## How to obtain Azure Powershell Module Version 
@@ -671,15 +679,6 @@ While (!((Get-AzureRmStorageAccountNameAvailability -Name $saEastName).NameAvail
 
 New-AzureRmStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saEastName -Location $eastLocation -Type Standard_LRS -Kind Storage
 
-# Creates Container for VHD's (Virtual Disks)
-Write-WithTime -Output "Create Container for VHD's (Virtual Disks)" -Log $Log
-$saWest = Get-AzureRMStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saWestName
-$saEast = Get-AzureRMStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name $saEastName
-
-  
-New-AzureStorageContainer -Name "vhds" -Permission Off -Context $saWest.Context -ErrorAction SilentlyContinue 
-New-AzureStorageContainer -Name "vhds" -Permission Off -Context $saEast.Context -ErrorAction SilentlyContinue
-
 ### End of Storage Accounts Section
 
 ### Start of Deploying VMs Section
@@ -718,21 +717,21 @@ $dcnic = New-AzureRmNetworkInterface -ResourceGroupName $rgWest.ResourceGroupNam
 # VM Config
 Write-WithTime -Output " Working on vm configuration" -Log $Log
 
+# Construct the drive names for the SYSTEM and DATA drives
 $vmOSDiskName = [string]::Format("{0}-OSDisk",$vmName)
-$vhdURI = [System.Uri]([string]::Format("https://{0}.blob.core.windows.net/vhds/{1}.vhd",$saWestName,$vmOSDiskName))
-
 $vmDataDiskName = [string]::Format("{0}-DataDisk",$vmName)
-$vhdDataDiskURI = [System.Uri]([string]::Format("https://{0}.blob.core.windows.net/vhds/{1}.vhd",$saWestName,$vmDataDiskName))
 
-$locAdmin = "localadmin"
-$creds = Get-Credential -UserName $locAdmin -Message "Enter password for user: $locAdmin"
+$dc01VmConfig = New-AzureRmVMConfig -VMName $vmName -VMSize "Standard_D1_v2" -Verbose
 
-$dc01VmConfig = New-AzureRmVMConfig -VMName $vmName -VMSize "Standard_D1"
+Set-AzureRmVMOperatingSystem -VM $dc01VmConfig -Windows -ComputerName $vmName -Credential $creds -Verbose
+Set-AzureRmVMSourceImage -VM $dc01VmConfig -PublisherName $vmRmImage.PublisherName -Offer $vmRmImage.Offer -Skus $vmRmImage.Skus -Version $vmRmImage.Version -Verbose
 
-Set-AzureRmVMOperatingSystem -VM $dc01VmConfig -Windows -ComputerName $vmName -Credential $creds
-Set-AzureRmVMSourceImage -VM $dc01VmConfig -PublisherName $vmRmImage.PublisherName -Offer $vmRmImage.Offer -Skus $vmRmImage.Skus -Version $vmRmImage.Version
-Set-AzureRmVMOSDisk -VM $dc01VmConfig -Name $vmOSDiskName -VhdUri $vhdURI -Caching ReadWrite -CreateOption fromImage
-Add-AzureRmVmDataDisk -VM $dc01VmConfig -Name $vmDataDiskName -DiskSizeInGB 1023 -VhdUri $vhdDataDiskURI -Caching None -Lun 0 -CreateOption Empty
+# Create OS system drive as a managed disk
+Set-AzureRmVMOSDisk -VM $dc01VmConfig -Name $vmOSDiskName -StorageAccountType StandardLRS -DiskSizeInGB 128 -CreateOption FromImage -Caching ReadWrite -Verbose
+# Add data disks
+Write-WithTime -Output "Adding data disk for NTDS, SYSV and LOGS directories..." -Log $Log
+Add-AzureRmVmDataDisk -VM $dc01VmConfig -Name $vmDataDiskName -StorageAccountType StandardLRS -Lun 0 -DiskSizeInGB 10 -CreateOption Empty -Caching None -Verbose
+# Add nic
 Add-AzureRmVMNetworkInterface -VM $dc01VmConfig -Id $dcnic.Id
 
 Write-WithTime -Output "Deploying vm" -Log $Log
@@ -747,7 +746,7 @@ Invoke-AzureRmPowershellDSCAD -OutputPackageFolder c:\deployment `
                             -DscConfigFunction DcConfig `
                             -dscConfigDataFile ConfigDataAD.psd1 `
                             -ResourceGroupName $rgWest.ResourceGroupName `
-                            -VMName "DC" `
+                            -VMName $vmName `
                             -StagingSaName $saWestName `
                             -stagingSaResourceGroupName $rgStorage.ResourceGroupName `
                             -Credentials $creds
@@ -796,14 +795,16 @@ $iis01nic = New-AzureRmNetworkInterface -ResourceGroupName $rgEast.ResourceGroup
 Write-WithTime -Output " Working on vm configuration" -Log $Log
 
 $vmOSDiskName = [string]::Format("{0}-OSDisk",$vmName)
-$vhdURI = [System.Uri]([string]::Format("https://{0}.blob.core.windows.net/vhds/{1}.vhd",$saEastName,$vmOSDiskName))
  
 $iisVmConfig01= New-AzureRmVMConfig -VMName $vmName -VMSize "Standard_D1" -AvailabilitySetId $IISAVSet.Id
 
 Set-AzureRmVMOperatingSystem -VM $iisVmConfig01 -Windows -ComputerName $vmName -Credential $creds
 Set-AzureRmVMSourceImage -VM $iisVmConfig01 -PublisherName $vmRmImage.PublisherName -Offer $vmRmImage.Offer -Skus $vmRmImage.Skus -Version $vmRmImage.Version
-Set-AzureRmVMOSDisk -VM $iisVmConfig01 -Name $vmOSDiskName -VhdUri $vhdURI -Caching ReadWrite -CreateOption fromImage
-Add-AzureRmVMNetworkInterface -VM $iisVmConfig01 -Id $iis01nic.Id
+
+# Use managed disk for OS drive
+Set-AzureRmVMOSDisk -VM $iisVmConfig01 -Name $vmOSDiskName -StorageAccountType StandardLRS -DiskSizeInGB 128 -CreateOption FromImage -Caching ReadWrite -Verbose
+
+Add-AzureRmVMNetworkInterface -VM $iisVmConfig01 -Id $iis01nic.Id -Verbose
 
 Write-WithTime -Output " Deploying vm" -Log $Log
 New-AzureRmVM -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocation -VM $iisVmConfig01
@@ -830,7 +831,7 @@ Invoke-AzureRmPowershellDSCIIS -OutputPackageFolder c:\deployment `
                             -DscConfigFile IISInstall.ps1 `
                             -DscConfigFunction IISInstall `
                             -ResourceGroupName $rgEast.ResourceGroupName `
-                            -VMName $vmname  `
+                            -VMName $vmName  `
                             -StagingSaName $saEastName `
                             -stagingSaResourceGroupName $rgStorage.ResourceGroupName
 
@@ -850,13 +851,15 @@ $iis02nic = New-AzureRmNetworkInterface -ResourceGroupName $rgEast.ResourceGroup
 Write-WithTime -Output " Working on vm configuration" -Log $Log
 
 $vmOSDiskName = [string]::Format("{0}-OSDisk",$vmName)
-$vhdURI = [System.Uri]([string]::Format("https://{0}.blob.core.windows.net/vhds/{1}.vhd",$saEastName,$vmOSDiskName))
  
 $iisVmConfig02= New-AzureRmVMConfig -VMName $vmName -VMSize "Standard_D1" -AvailabilitySetId $IISAVSet.Id
 
 Set-AzureRmVMOperatingSystem -VM $iisVmConfig02 -Windows -ComputerName $vmName -Credential $creds
 Set-AzureRmVMSourceImage -VM $iisVmConfig02 -PublisherName $vmRmImage.PublisherName -Offer $vmRmImage.Offer -Skus $vmRmImage.Skus -Version $vmRmImage.Version
-Set-AzureRmVMOSDisk -VM $iisVmConfig02 -Name $vmOSDiskName -VhdUri $vhdURI -Caching ReadWrite -CreateOption fromImage
+
+# Use managed disks for OS drive
+Set-AzureRmVMOSDisk -VM $iisVmConfig02 -Name $vmOSDiskName -StorageAccountType StandardLRS -DiskSizeInGB 128 -CreateOption FromImage -Caching ReadWrite -Verbose
+
 Add-AzureRmVMNetworkInterface -VM $iisVmConfig02 -Id $iis02nic.Id
 
 Write-WithTime -Output " Deploying vm" -Log $Log
@@ -935,4 +938,4 @@ NOTE: [TEST-DEV / POC SCENARIOS ONLY!!!] To quickly and conveniently remove all 
 
 # Get-AzureRmResourceGroup | Where-Object { $_.ResourceGroupName -match 'poc' } | Remove-AzureRmResourceGroup -Force
 
-#endregion FOOTER
+#endregion FOOTER 
