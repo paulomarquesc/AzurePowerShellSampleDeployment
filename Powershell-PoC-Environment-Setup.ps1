@@ -63,9 +63,9 @@ Change Log:
 * Prompt for credentials with the $creds variable earlier in the script within the INITIALIZATION region before the main script, right after prompting for the subscription name
   This allows to the operator to quickly specify all required user parameters without having to wait for a long period before looking for an interacting again with the script for it to continue. 
 * Replaced Standard_D1 size with Standard_D1_v2 since performance is better and cost is the same.
-* Added Dns check to ensure public IP address label of load balancer is available before assigning it a public IP address. See code block ending with: Until (-not((Resolve-DnsName $albFqdn)[0].IpAddress))
 * Added the -managed parameter to the IIS availability set to integrate with the managed disk feature
 * Corrected $iisVmConfig01= New-AzureRmVMConfig -VMName $vmName -VMSize "Standard_D1" -AvailabilitySetId $IISAVSet.Id, to use the upgraded "Standard_D1_v2" size instead
+* 19MAR2017-2228UTC: Re-added the load balancer Dns A record test for global uniqueness
 #>
 
 $errorActionPreference = [System.Management.Automation.ActionPreference]::Stop
@@ -521,17 +521,20 @@ New-AzureRmVirtualNetworkGatewayConnection -Name "$eastlocation-gwConnection" `
 # Azure Load Balancer Public Ip Address
 Write-WithTime -Output "Creating the IIS Loadbalancer" -Log $Log
 
-# Add a random infix (4 numeric digits) inside the Dnslabel name to avoid conflicts with existing deployments generated from this script. The -pip suffix indicates this is a public IP
+# Add a random infix (4 numeric digits) inside the Dnslabel name to avoid conflicts with existing deployments generated from this script. 
+# The -pip suffix indicates this is a public IP
+# Additionally a DNS resolutionn test is made for the generated fqdn for the load balancer to ensure it is globablly unique in DNS before proceeding.
+# This is performed to avoid potential conflicts, where if the DNS name is already taken, it may resolve to the wrong IP address.
 
+Do
+{
  $RandomString = New-RandomString
  [string]$dnsLabelInfix = $RandomString.SubString(8,4)
  $albPublicIpDNSName = "pociisalb-" + $dnsLabelInfix + "-pip"
-
- # TODO: Test uniqueness of DNS entry
-<#
  $DnsSuffix = ".cloudapp.azure.com"
  $albFqdn = $albPublicIpDNSName + "." + $eastLocation + $DnsSuffix
-#>
+} #end Do
+Until (-not(Resolve-DnsName $albFqdn -Type A -ErrorAction SilentlyContinue))
 
 $albPublicIP = New-AzureRmPublicIpAddress -Name "albIISpip" -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocation –AllocationMethod Static -DomainNameLabel $albPublicIpDNSName
 
