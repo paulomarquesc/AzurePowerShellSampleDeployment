@@ -63,6 +63,9 @@ Change Log:
 * Prompt for credentials with the $creds variable earlier in the script within the INITIALIZATION region before the main script, right after prompting for the subscription name
   This allows to the operator to quickly specify all required user parameters without having to wait for a long period before looking for an interacting again with the script for it to continue. 
 * Replaced Standard_D1 size with Standard_D1_v2 since performance is better and cost is the same.
+* Added Dns check to ensure public IP address label of load balancer is available before assigning it a public IP address. See code block ending with: Until (-not((Resolve-DnsName $albFqdn)[0].IpAddress))
+* Added the -managed parameter to the IIS availability set to integrate with the managed disk feature
+* Corrected $iisVmConfig01= New-AzureRmVMConfig -VMName $vmName -VMSize "Standard_D1" -AvailabilitySetId $IISAVSet.Id, to use the upgraded "Standard_D1_v2" size instead
 #>
 
 $errorActionPreference = [System.Management.Automation.ActionPreference]::Stop
@@ -174,7 +177,7 @@ function Invoke-AzureRmPowershellDSCAD
     Upload-BlobFile -storageAccountName $stagingSaName -ResourceGroupName $stagingSaResourceGroupName -containerName "windows-powershell-dsc" -fullFileName $outputPackagePath
 	
 	##
-    ## In order to know current extension version, you can use the following cmdlet to obatin it (user must be co-admin of the subscription and a subscription in ASM mode must be set as default)
+    ## In order to know current extension version, you can use the following cmdlet to obatain it (user must be co-admin of the subscription and a subscription in ASM mode must be set as default)
     ## $dscExt = Get-AzureVMAvailableExtension -ExtensionName DSC -Publisher Microsoft.Powershell
 	##
 
@@ -280,7 +283,7 @@ Function New-RandomString
 # Script Start
 #----------------------------------------------------------------------------------------------------------------------
 
-# Authenticate to Azure and select a subscription
+# Authenticate to Azure
 Add-AzureRmAccount
 
 # Start time so that total script execution time can be measured at script completion.
@@ -342,7 +345,7 @@ Do
 {
  # Subscription name
  $defaultSubscription = (Get-AzureRmSubscription).SubscriptionName
- Write-ToConsoleAndLog -Output "Default subsription found is: $defaultSubscription" -Log $Log
+ Write-ToConsoleAndLog -Output "Default subsriptions found are: $defaultSubscription" -Log $Log
  $subscriptionPrompt = "Please enter your subscription name "
  Write-ToLogOnly -Output $subscriptionPrompt -Log $Log
  [string] $Subscription = Read-Host $subscriptionPrompt
@@ -397,7 +400,7 @@ $rgStorage = New-AzureRmResourceGroup -Name "poc-storage-rg" -Location $eastLoca
 
 ### Start of Virtual Networks Section
 
-# Subnet Creation
+# Subnets Creation
 Write-WithTime -Output "Creating Subnets..." -Log $Log
 
 # Subnets belonging to West Location
@@ -417,7 +420,7 @@ $appSNEast = New-AzureRmVirtualNetworkSubnetConfig -Name $appSNNameEast -Address
 # West Virtual Network Creation
 Write-WithTime -Output "Creating west virtual network" -Log $Log
 $vnetwest = New-AzureRmVirtualNetwork -Name "West-VNET" -ResourceGroupName $rgWest.ResourceGroupName -Location $westLocation -AddressPrefix "10.0.0.0/16" -Subnet $infraSNWest,$gwSNWest
-
+# Eest Virtual Network Creation
 Write-WithTime -Output "Creating east virtual network" -Log $Log
 $vneteast = New-AzureRmVirtualNetwork -Name "East-VNET" -ResourceGroupName $rgEast.ResourceGroupName -Location $eastLocation -AddressPrefix "192.168.0.0/16" -Subnet $appSNEast,$gwSNEast 
 
@@ -519,14 +522,22 @@ New-AzureRmVirtualNetworkGatewayConnection -Name "$eastlocation-gwConnection" `
 Write-WithTime -Output "Creating the IIS Loadbalancer" -Log $Log
 
 # Add a random infix (4 numeric digits) inside the Dnslabel name to avoid conflicts with existing deployments generated from this script. The -pip suffix indicates this is a public IP
-$RandomString = New-RandomString
-$dnsLableInfix = $RandomString.SubString(8,4)
-$albPublicIpDNSName = "pociisalb-" + $dnsLabelInfix + "-pip"
-$albPublicIP = New-AzureRmPublicIpAddress   -Name "albIISpip" -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocation –AllocationMethod Static -DomainNameLabel $albPublicIpDNSName
+
+ $RandomString = New-RandomString
+ [string]$dnsLabelInfix = $RandomString.SubString(8,4)
+ $albPublicIpDNSName = "pociisalb-" + $dnsLabelInfix + "-pip"
+
+ # TODO: Test uniqueness of DNS entry
+<#
+ $DnsSuffix = ".cloudapp.azure.com"
+ $albFqdn = $albPublicIpDNSName + "." + $eastLocation + $DnsSuffix
+#>
+
+$albPublicIP = New-AzureRmPublicIpAddress -Name "albIISpip" -ResourceGroupName $rgEast.ResourceGroupName -Location $eastlocation –AllocationMethod Static -DomainNameLabel $albPublicIpDNSName
 
 ##
 ## If you want to get the existing load balancer resource you can use the following cmdlet
-## $albPublicIP = Get-AzureRmPublicIpAddress -ResourceGroupName $rgEast.ResourceGroupName -Name "albIISpip" `
+## $albPublicIP = Get-AzureRmPublicIpAddress -ResourceGroupName $rgEast.ResourceGroupName -Name "albIISpip"
 ##
 
 # Defining Load Balancer items
@@ -556,11 +567,11 @@ $lbRule1 = New-AzureRmLoadBalancerRuleConfig -Name HTTP `
 # Load Balancer
 $IISAlb = New-AzureRmLoadBalancer -ResourceGroupName $rgEast.ResourceGroupName `
                     -Name "POC-IIS-ALB" `
-                    -Location $eastLocation  `
-                    -FrontendIpConfiguration $frontendIP  `
-                    -InboundNatRule $inboundNATRule1,$inboundNatRule2  `
+                    -Location $eastLocation `
+                    -FrontendIpConfiguration $frontendIP `
+                    -InboundNatRule $inboundNATRule1,$inboundNatRule2 `
                     -LoadBalancingRule $lbRule1 `
-                    -BackendAddressPool $beAddressPool  `
+                    -BackendAddressPool $beAddressPool `
                     -Probe $wwwHealthProbe 
 
 # Public IP Address of Domain Controller - in this case we showcase that attached a server directly to a public ip address is possible
@@ -654,7 +665,8 @@ Set-AzureRmVirtualNetworkSubnetConfig -Name $AppSNNameEast -VirtualNetwork $vnet
 #-------------------------------------------------------
 # Create Storage Account for East Region & West Region
 #-------------------------------------------------------
-
+# NOTE: Storage accounts will only be used to host the uploaded DSC configuration and data files, as well as modules for the domain controller and IIS server configuration tasks.
+# Storage accounts will not be used for hosting the OS or data disk vhd drives for the VMs. This is because managed disks will be used instead for all VMs.
 Write-WithTime -Output "Create Storage Account for East Region & West Region" -Log $Log
 
 # Create a new random string, then extract the 4 digits to use as the last characters for the storage account name for each region
@@ -728,9 +740,10 @@ Set-AzureRmVMSourceImage -VM $dc01VmConfig -PublisherName $vmRmImage.PublisherNa
 
 # Create OS system drive as a managed disk
 Set-AzureRmVMOSDisk -VM $dc01VmConfig -Name $vmOSDiskName -StorageAccountType StandardLRS -DiskSizeInGB 128 -CreateOption FromImage -Caching ReadWrite -Verbose
-# Add data disks
+# Add data disk drive as a managed disk
 Write-WithTime -Output "Adding data disk for NTDS, SYSV and LOGS directories..." -Log $Log
 Add-AzureRmVmDataDisk -VM $dc01VmConfig -Name $vmDataDiskName -StorageAccountType StandardLRS -Lun 0 -DiskSizeInGB 10 -CreateOption Empty -Caching None -Verbose
+
 # Add nic
 Add-AzureRmVMNetworkInterface -VM $dc01VmConfig -Id $dcnic.Id
 
@@ -763,10 +776,10 @@ Set-AzureRmVirtualNetwork -VirtualNetwork $westVnet
 
 # IIS virtual machines
 
-# Creating Availability set for IIS load balanced set
+# Creating Availability set for IIS load balanced set and for use with managed disks
 $IISAVSetName = "IIS-AS"
-Write-WithTime -Output "Creating Availability set for IIS load balanced set" -Log $Log
-$IISAVSet = New-AzureRmAvailabilitySet -ResourceGroupName $rgEast.ResourceGroupName -Name $IISAVSetName -Location $eastlocation  
+Write-WithTime -Output "Creating Availability set for IIS load balanced set and to support managed disk" -Log $Log
+$IISAVSet = New-AzureRmAvailabilitySet -ResourceGroupName $rgEast.ResourceGroupName -Name $IISAVSetName -Location $eastlocation -PlatformUpdateDomainCount 5 -PlatformFaultDomainCount 2 -Managed -Verbose 
 
 # IIS01
 $vmName = "iis01"
@@ -796,7 +809,7 @@ Write-WithTime -Output " Working on vm configuration" -Log $Log
 
 $vmOSDiskName = [string]::Format("{0}-OSDisk",$vmName)
  
-$iisVmConfig01= New-AzureRmVMConfig -VMName $vmName -VMSize "Standard_D1" -AvailabilitySetId $IISAVSet.Id
+$iisVmConfig01= New-AzureRmVMConfig -VMName $vmName -VMSize "Standard_D1_v2" -AvailabilitySetId $IISAVSet.Id
 
 Set-AzureRmVMOperatingSystem -VM $iisVmConfig01 -Windows -ComputerName $vmName -Credential $creds
 Set-AzureRmVMSourceImage -VM $iisVmConfig01 -PublisherName $vmRmImage.PublisherName -Offer $vmRmImage.Offer -Skus $vmRmImage.Skus -Version $vmRmImage.Version
@@ -821,7 +834,7 @@ Set-AzureRmVmExtension -ResourceGroupName $rgEast.ResourceGroupName `
                         -TypeHandlerVersion "1.3" `
                         -VMName $vmname `
                         -Location $eastLocation `
-                        -Settings @{ "Name" = $DomainName; "OUPath" = ""; "User" = $JoinDomainUserName; "Restart" = "true"; "Options" = 3}  `
+                        -Settings @{ "Name" = $DomainName; "OUPath" = ""; "User" = $JoinDomainUserName; "Restart" = "true"; "Options" = 3} `
                         -ProtectedSettings @{"Password" = "$($creds.GetNetworkCredential().Password)"}  
 
 # Configuring VM to hold IIS feature via Powershell DSC
@@ -852,7 +865,7 @@ Write-WithTime -Output " Working on vm configuration" -Log $Log
 
 $vmOSDiskName = [string]::Format("{0}-OSDisk",$vmName)
  
-$iisVmConfig02= New-AzureRmVMConfig -VMName $vmName -VMSize "Standard_D1" -AvailabilitySetId $IISAVSet.Id
+$iisVmConfig02= New-AzureRmVMConfig -VMName $vmName -VMSize "Standard_D1_v2" -AvailabilitySetId $IISAVSet.Id
 
 Set-AzureRmVMOperatingSystem -VM $iisVmConfig02 -Windows -ComputerName $vmName -Credential $creds
 Set-AzureRmVMSourceImage -VM $iisVmConfig02 -PublisherName $vmRmImage.PublisherName -Offer $vmRmImage.Offer -Skus $vmRmImage.Skus -Version $vmRmImage.Version
