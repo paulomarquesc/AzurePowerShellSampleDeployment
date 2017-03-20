@@ -528,11 +528,11 @@ Write-WithTime -Output "Creating the IIS Loadbalancer" -Log $Log
 
 Do
 {
- $RandomString = New-RandomString
- [string]$dnsLabelInfix = $RandomString.SubString(8,4)
+ $randomString = New-RandomString
+ [string]$dnsLabelInfix = $randomString.SubString(8,4)
  $albPublicIpDNSName = "pociisalb-" + $dnsLabelInfix + "-pip"
- $DnsSuffix = ".cloudapp.azure.com"
- $albFqdn = $albPublicIpDNSName + "." + $eastLocation + $DnsSuffix
+ $dnsSuffix = ".cloudapp.azure.com"
+ $albFqdn = $albPublicIpDNSName + "." + $eastLocation + $dnsSuffix
 } #end Do
 Until (-not(Resolve-DnsName $albFqdn -Type A -ErrorAction SilentlyContinue))
 
