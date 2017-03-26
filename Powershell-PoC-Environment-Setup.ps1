@@ -65,7 +65,8 @@ Change Log:
 * Replaced Standard_D1 size with Standard_D1_v2 since performance is better and cost is the same.
 * Added the -managed parameter to the IIS availability set to integrate with the managed disk feature
 * Corrected $iisVmConfig01= New-AzureRmVMConfig -VMName $vmName -VMSize "Standard_D1" -AvailabilitySetId $IISAVSet.Id, to use the upgraded "Standard_D1_v2" size instead
-* 19MAR2017-2228UTC: Re-added the load balancer Dns A record test for global uniqueness
+* Re-added the load balancer Dns A record test for global uniqueness
+* Adjusted indentation of loops and conditional blocks using tabs
 #>
 
 $errorActionPreference = [System.Management.Automation.ActionPreference]::Stop
@@ -251,29 +252,29 @@ function Invoke-AzureRmPowershellDSCIIS
 
 Function New-RandomString
 {
- $combinedCharArray = @()
- $complexityRuleSets = @()
- $passwordArray = @()
- # PCR here means [P]assword [C]omplexity [R]equirement, so the $PCRSampleCount value represents the number of characters that will be generated for each password complexity requirement (alpha upper, lower, and numeric)
- $pcrSampleCount = 4
- $pcr1AlphaUpper = ([char[]]([char]65..[char]90))
- $pcr3AlphaLower = ([char[]]([char]97..[char]122))
- $pcr4Numeric = ([char[]]([char]48..[char]57))
+    $combinedCharArray = @()
+    $complexityRuleSets = @()
+    $passwordArray = @()
+    # PCR here means [P]assword [C]omplexity [R]equirement, so the $PCRSampleCount value represents the number of characters that will be generated for each password complexity requirement (alpha upper, lower, and numeric)
+    $pcrSampleCount = 4
+    $pcr1AlphaUpper = ([char[]]([char]65..[char]90))
+    $pcr3AlphaLower = ([char[]]([char]97..[char]122))
+    $pcr4Numeric = ([char[]]([char]48..[char]57))
 
- # Add all of the PCR... arrays into a single consolidated array
- $combinedCharArray = $pcr1AlphaUpper + $pcr3AlphaLower + $prc4Numeric
- # This is the set of complexity rules, so it's an array of arrays
- $complexityRuleSets = ($pcr1AlphaUpper, $pcr3AlphaLower, $pcr4Numeric)
+    # Add all of the PCR... arrays into a single consolidated array
+    $combinedCharArray = $pcr1AlphaUpper + $pcr3AlphaLower + $prc4Numeric
+    # This is the set of complexity rules, so it's an array of arrays
+    $complexityRuleSets = ($pcr1AlphaUpper, $pcr3AlphaLower, $pcr4Numeric)
 
- # Sample 4 characters from each of the 3 complexity rule sets to generate a complete 12 character random string
- ForEach ($complexityRuleSet in $complexityRuleSets)
- {
-  Get-Random -InputObject $complexityRuleSet -Count $pcrSampleCount | ForEach-Object { $passwordArray += $_ }
- } #end ForEach
+    # Sample 4 characters from each of the 3 complexity rule sets to generate a complete 12 character random string
+    ForEach ($complexityRuleSet in $complexityRuleSets)
+    {
+        Get-Random -InputObject $complexityRuleSet -Count $pcrSampleCount | ForEach-Object { $passwordArray += $_ }
+    } #end ForEach
 
- [string]$randomStringWithSpaces = $passwordArray
- $RandomString = $RandomStringWithSpaces.Replace(" ","")
- return $RandomString
+    [string]$randomStringWithSpaces = $passwordArray
+    $RandomString = $RandomStringWithSpaces.Replace(" ","")
+    return $RandomString
 } #end Function
 
 #endregion FUNCTIONS
@@ -298,7 +299,7 @@ $logDir = "PowerShellAzurePoC"
 $logPath = $env:HOMEPATH + "\" + $logDir
 If (!(Test-Path $logPath))
 {
- New-Item -Path $logPath -ItemType Directory
+    New-Item -Path $logPath -ItemType Directory
 } #End If
 
 # Create both log and transcript files with time/date stamps included in their filenames
@@ -319,19 +320,19 @@ Start-Transcript -Path $Transcript -IncludeInvocationHeader -Append -Verbose
 # Create and populate prompts object with property-value pairs
 # PROMPTS (promptsObj)
 $promptsObj = [PSCustomObject]@{
- pAskToOpenLogs = "Would you like to open the deployment logs now ? [YES/NO]"
+    pAskToOpenLogs = "Would you like to open the deployment logs now ? [YES/NO]"
 } #end $PromptsObj
 
 # Create and populate responses object with property-value pairs
 # RESPONSES (ResponsesObj): Initialize all response variables with null value
 $responsesObj = [PSCustomObject]@{
- pOpenLogsNow = $null
+    pOpenLogsNow = $null
 } #end $ResponsesObj
 
 # To avoid multiple versions installed on the same system, first uninstall any previously installed and loaded versions if they exist
 If (Get-Module | Where-Object { $_.Name -eq 'WriteToLogs'})
 {
- Uninstall-Module -Name WriteToLogs -AllVersions -ErrorAction SilentlyContinue -Verbose
+    Uninstall-Module -Name WriteToLogs -AllVersions -ErrorAction SilentlyContinue -Verbose
 } #end if
 
 # Next, install and import it for use later in the script for logging operations
@@ -343,13 +344,13 @@ Import-Module -Name WriteToLogs -Verbose
 
 Do
 {
- # Subscription name
- $defaultSubscription = (Get-AzureRmSubscription).SubscriptionName
- Write-ToConsoleAndLog -Output "Default subsriptions found are: $defaultSubscription" -Log $Log
- $subscriptionPrompt = "Please enter your subscription name "
- Write-ToLogOnly -Output $subscriptionPrompt -Log $Log
- [string] $Subscription = Read-Host $subscriptionPrompt
- $Subscription = $Subscription.ToUpper()
+    # Subscription name
+    $defaultSubscription = (Get-AzureRmSubscription).SubscriptionName
+    Write-ToConsoleAndLog -Output "Default subsriptions found are: $defaultSubscription" -Log $Log
+    $subscriptionPrompt = "Please enter your subscription name "
+    Write-ToLogOnly -Output $subscriptionPrompt -Log $Log
+    [string] $Subscription = Read-Host $subscriptionPrompt
+    $Subscription = $Subscription.ToUpper()
 } #end Do
 Until (($Subscription) -ne $null)
 
@@ -528,11 +529,11 @@ Write-WithTime -Output "Creating the IIS Loadbalancer" -Log $Log
 
 Do
 {
- $randomString = New-RandomString
- [string]$dnsLabelInfix = $randomString.SubString(8,4)
- $albPublicIpDNSName = "pociisalb-" + $dnsLabelInfix + "-pip"
- $dnsSuffix = ".cloudapp.azure.com"
- $albFqdn = $albPublicIpDNSName + "." + $eastLocation + $dnsSuffix
+    $randomString = New-RandomString
+    [string]$dnsLabelInfix = $randomString.SubString(8,4)
+    $albPublicIpDNSName = "pociisalb-" + $dnsLabelInfix + "-pip"
+    $dnsSuffix = ".cloudapp.azure.com"
+    $albFqdn = $albPublicIpDNSName + "." + $eastLocation + $dnsSuffix
 } #end Do
 Until (-not(Resolve-DnsName $albFqdn -Type A -ErrorAction SilentlyContinue))
 
@@ -676,8 +677,8 @@ Write-WithTime -Output "Create Storage Account for East Region & West Region" -L
 # If the storage account name has already been taken, i.e. not available, continue to generate a new name that can be used
 Do 
 {
- $randomString = New-RandomString
- $saWestName  = $randomString.Substring(4,8)
+    $randomString = New-RandomString
+    $saWestName  = $randomString.Substring(4,8)
 } #end while
 While (!((Get-AzureRmStorageAccountNameAvailability -Name $saWestName).NameAvailable)) 
 
@@ -687,8 +688,8 @@ New-AzureRmStorageAccount -ResourceGroupName $rgStorage.ResourceGroupName -Name 
 # If the storage account name has already been taken, i.e. not available, continue to generate a new name that can be used
 Do 
 {
- $randomString = New-RandomString
- $saEastName = $randomString.Substring(4,8)
+    $randomString = New-RandomString
+    $saEastName = $randomString.Substring(4,8)
 } #end while
 While (!((Get-AzureRmStorageAccountNameAvailability -Name $saEastName).NameAvailable)) 
 
@@ -793,7 +794,7 @@ Write-WithTime -Output " Setting up nic" -Log $Log
 
 # Getting Vnet and subnet resources
 $vnet  = Get-AzureRmVirtualNetwork -ResourceGroupName $rgEast.ResourceGroupName -Name "East-Vnet"
-$AppSubnet = Get-AzureRmVirtualNetworkSubnetConfig -Name "East-VNET-App-Subnet" -VirtualNetwork $vnet
+$appSubnet = Get-AzureRmVirtualNetworkSubnetConfig -Name "East-VNET-App-Subnet" -VirtualNetwork $vnet
 
 # Getting Load Balancer if needed 
 $IISAlb = Get-AzureRmLoadBalancer -Name "POC-IIS-ALB"  -ResourceGroupName $rgEast.ResourceGroupName
@@ -803,7 +804,7 @@ $iis01nic = New-AzureRmNetworkInterface -ResourceGroupName $rgEast.ResourceGroup
                     -Location $eastLocation `
                     -Name "$vmName-nic" `
                     -PrivateIpAddress "192.168.0.4" `
-                    -Subnet $AppSubnet `
+                    -Subnet $appSubnet `
                     -LoadBalancerBackendAddressPool $IISAlb.BackendAddressPools[0] `
                     -LoadBalancerInboundNatRule $IISAlb.InboundNatRules[0] `
                     -DnsServer 10.0.0.4
@@ -859,7 +860,7 @@ $iis02nic = New-AzureRmNetworkInterface -ResourceGroupName $rgEast.ResourceGroup
                     -Location $eastLocation `
                     -Name "$vmName-nic" `
                     -PrivateIpAddress "192.168.0.5" `
-                    -Subnet $AppSubnet `
+                    -Subnet $appSubnet `
                     -LoadBalancerBackendAddressPool $IISAlb.BackendAddressPools[0] `
                     -LoadBalancerInboundNatRule $IISAlb.InboundNatRules[1] `
                     -DnsServer 10.0.0.4
@@ -928,16 +929,16 @@ Write-ToConsoleAndLog -Output $delimDouble -Log $Log
 # Prompt to open logs
 Do 
 {
- $responsesObj.pOpenLogsNow = read-host $promptsObj.pAskToOpenLogs
- $responsesObj.pOpenLogsNow = $responsesObj.pOpenLogsNow.ToUpper()
+    $responsesObj.pOpenLogsNow = read-host $promptsObj.pAskToOpenLogs
+    $responsesObj.pOpenLogsNow = $responsesObj.pOpenLogsNow.ToUpper()
 }
 Until ($responsesObj.pOpenLogsNow -eq "Y" -OR $responsesObj.pOpenLogsNow -eq "YES" -OR $responsesObj.pOpenLogsNow -eq "N" -OR $responsesObj.pOpenLogsNow -eq "NO")
 
 # Exit if user does not want to continue
 if ($responsesObj.pOpenLogsNow -eq "Y" -OR $responsesObj.pOpenLogsNow -eq "YES") 
 {
- Start-Process notepad.exe $Log
- Start-Process notepad.exe $Transcript
+    Start-Process notepad.exe $Log
+    Start-Process notepad.exe $Transcript
 } #end if
 
 # End of script
