@@ -68,6 +68,7 @@ Change Log:
 * Re-added the load balancer Dns A record test for global uniqueness
 * Adjusted indentation of loops and conditional blocks using tabs
 * (Get-AzureRmSubscription).SubscriptionName fails to provide the name property. Fixed by changing 'SubscriptionName' property to just 'Name'.
+* Review and test script with latest Azure module 4.3.1. Test OK.
 #>
 
 $errorActionPreference = [System.Management.Automation.ActionPreference]::Stop
@@ -77,7 +78,6 @@ $errorActionPreference = [System.Management.Automation.ActionPreference]::Stop
 #----------------------------------------------------------------------------------------------------------------------
 
 #region FUNCTIONS
-
 function Create-DSCPackage
 {
 	param
