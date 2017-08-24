@@ -67,6 +67,8 @@ Change Log:
 * Corrected $iisVmConfig01= New-AzureRmVMConfig -VMName $vmName -VMSize "Standard_D1" -AvailabilitySetId $IISAVSet.Id, to use the upgraded "Standard_D1_v2" size instead
 * Re-added the load balancer Dns A record test for global uniqueness
 * Adjusted indentation of loops and conditional blocks using tabs
+* (Get-AzureRmSubscription).SubscriptionName fails to provide the name property. Fixed by changing 'SubscriptionName' property to just 'Name'.
+* Review and test script with latest Azure module 4.3.1. Test OK.
 #>
 
 $errorActionPreference = [System.Management.Automation.ActionPreference]::Stop
@@ -76,7 +78,6 @@ $errorActionPreference = [System.Management.Automation.ActionPreference]::Stop
 #----------------------------------------------------------------------------------------------------------------------
 
 #region FUNCTIONS
-
 function Create-DSCPackage
 {
 	param
@@ -345,7 +346,7 @@ Import-Module -Name WriteToLogs -Verbose
 Do
 {
     # Subscription name
-    $defaultSubscription = (Get-AzureRmSubscription).SubscriptionName
+    $defaultSubscription = (Get-AzureRmSubscription).Name
     Write-ToConsoleAndLog -Output "Default subsriptions found are: $defaultSubscription" -Log $Log
     $subscriptionPrompt = "Please enter your subscription name "
     Write-ToLogOnly -Output $subscriptionPrompt -Log $Log
@@ -355,7 +356,7 @@ Do
 Until (($Subscription) -ne $null)
 
 # Selects subscription based on subscription name provided in response to the prompt above
-Select-AzureRmSubscription -SubscriptionId (Get-AzureRmSubscription -SubscriptionName $Subscription).SubscriptionId
+Select-AzureRmSubscription -SubscriptionName $Subscription
 
 # Prompt for credentials
 $locAdmin = "localadmin"
